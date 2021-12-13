@@ -12,6 +12,8 @@ import React from "react";
 import type { RegisteredAdditionalCategoryColumn } from "./custom-category-columns";
 import hotbarStoreInjectable from "../../../common/hotbar-store.injectable";
 import type { HotbarStore } from "../../../common/hotbar-store";
+import { getIconColourHash } from "../../../common/catalog/helpers";
+import { EntityIcon } from "../entity-icon";
 
 const renderEntityName = (hotbarStore: HotbarStore) => (entity: CatalogEntity) => {
   const isItemInHotbar = hotbarStore.isAddedToActive(entity);
@@ -24,14 +26,12 @@ const renderEntityName = (hotbarStore: HotbarStore) => (entity: CatalogEntity) =
   return (
     <>
       <Avatar
-        title={entity.getName()}
-        colorHash={`${entity.getName()}-${entity.getSource()}`}
-        src={entity.spec.icon?.src}
+        colorHash={getIconColourHash(entity)}
         background={entity.spec.icon?.background}
         className={styles.catalogAvatar}
         size={24}
       >
-        {entity.spec.icon?.material && <Icon material={entity.spec.icon?.material} small/>}
+        <EntityIcon entity={entity}/>
       </Avatar>
       <span>{entity.getName()}</span>
       <Icon

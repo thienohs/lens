@@ -20,6 +20,7 @@ import { action, makeObservable, observable } from "mobx";
 import hotbarStoreInjectable from "../../../common/hotbar-store.injectable";
 import { withInjectables } from "@ogre-tools/injectable-react";
 import type { HotbarStore } from "../../../common/hotbar-store";
+import { getIconColourHash } from "../../../common/catalog/helpers";
 
 export interface HotbarMenuProps {
   className?: IClassName;
@@ -110,51 +111,48 @@ class NonInjectedHotbarMenu extends React.Component<Dependencies & HotbarMenuPro
             >
               {item && (
                 <Draggable draggableId={item.entity.uid} key={item.entity.uid} index={0} >
-                  {(provided, snapshot) => {
-                    const style = {
-                      zIndex: defaultHotbarCells - index,
-                      position: "absolute",
-                      ...provided.draggableProps.style,
-                    } as React.CSSProperties;
-
-                    return (
-                      <div
-                        key={item.entity.uid}
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        style={style}
-                      >
-                        {entity ? (
-                          <HotbarEntityIcon
-                            key={index}
-                            index={index}
-                            entity={entity}
-                            onClick={() => catalogEntityRegistry.onRun(entity)}
-                            className={cssNames({ isDragging: snapshot.isDragging })}
-                            remove={this.removeItem}
-                            add={this.addItem}
-                            size={40}
-                          />
-                        ) : (
-                          <HotbarIcon
-                            uid={`hotbar-icon-${item.entity.uid}`}
-                            title={item.entity.name}
-                            source={item.entity.source}
-                            tooltip={`${item.entity.name} (${item.entity.source})`}
-                            menuItems={[
-                              {
-                                title: "Remove from Hotbar",
-                                onClick: () => this.removeItem(item.entity.uid),
-                              },
-                            ]}
-                            disabled
-                            size={40}
-                          />
-                        )}
-                      </div>
-                    );
-                  }}
+                  {(provided, snapshot) => (
+                    <div
+                      key={item.entity.uid}
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                      style={{
+                        zIndex: defaultHotbarCells - index,
+                        position: "absolute",
+                        ...provided.draggableProps.style,
+                      } as React.CSSProperties}
+                    >
+                      {entity ? (
+                        <HotbarEntityIcon
+                          key={index}
+                          index={index}
+                          entity={entity}
+                          onClick={() => catalogEntityRegistry.onRun(entity)}
+                          className={cssNames({ isDragging: snapshot.isDragging })}
+                          remove={this.removeItem}
+                          add={this.addItem}
+                          size={40}
+                        />
+                      ) : (
+                        <HotbarIcon
+                          uid={`hotbar-icon-${item.entity.uid}`}
+                          source={item.entity.source}
+                          colorHash={getIconColourHash(item.entity)}
+                          tooltip={`${item.entity.name} (${item.entity.source})`}
+                          menuItems={[
+                            {
+                              title: "Remove from Hotbar",
+                              onClick: () => this.removeItem(item.entity.uid),
+                            },
+                          ]}
+                          disabled
+                          size={40}
+                          avatarChildren={item.entity.shortName}
+                        />
+                      )}
+                    </div>
+                  )}
                 </Draggable>
               )}
               {provided.placeholder}

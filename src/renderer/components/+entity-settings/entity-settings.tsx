@@ -19,6 +19,8 @@ import logger from "../../../common/logger";
 import { Avatar } from "../avatar";
 import { withInjectables } from "@ogre-tools/injectable-react";
 import entitySettingsRouteParametersInjectable from "./entity-settings-route-parameters.injectable";
+import { getIconColourHash } from "../../../common/catalog/helpers";
+import { EntityIcon } from "../entity-icon";
 
 interface Dependencies {
   entityId: IComputedValue<string>;
@@ -83,12 +85,12 @@ class NonInjectedEntitySettings extends React.Component<Dependencies> {
       <>
         <div className="flex items-center pb-8">
           <Avatar
-            title={this.entity.getName()}
-            colorHash={`${this.entity.getName()}-${this.entity.metadata.source}`}
-            src={this.entity.spec.icon?.src}
+            colorHash={getIconColourHash(this.entity)}
             className={styles.settingsAvatar}
             size={40}
-          />
+          >
+            <EntityIcon entity={this.entity}/>
+          </Avatar>
           <div className={styles.entityName}>
             {this.entity.getName()}
           </div>

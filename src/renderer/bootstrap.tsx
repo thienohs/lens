@@ -43,6 +43,7 @@ import hotbarStoreInjectable from "../common/hotbar-store.injectable";
 import { bindEvents } from "./navigation/events";
 import deleteClusterDialogModelInjectable from "./components/delete-cluster-dialog/delete-cluster-dialog-model/delete-cluster-dialog-model.injectable";
 import { init } from "@sentry/electron/renderer";
+import { EntityPreferencesStore } from "../common/entity-preferences-store";
 
 configurePackages(); // global packages
 registerCustomThemes(); // monaco editor themes
@@ -119,6 +120,8 @@ export async function bootstrap(di: DiContainer) {
   const clusterStore = di.inject(clusterStoreInjectable);
 
   await clusterStore.loadInitialOnRenderer();
+
+  EntityPreferencesStore.createInstance();
 
   // HotbarStore depends on: ClusterStore
   di.inject(hotbarStoreInjectable);

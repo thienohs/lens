@@ -27,7 +27,7 @@ import { disposer, getAppVersion, getAppVersionFromProxyServer } from "../common
 import { ipcMainOn } from "../common/ipc";
 import { startUpdateChecking } from "./app-updater";
 import { IpcRendererNavigationEvents } from "../renderer/navigation/events";
-import { startCatalogSyncToRenderer } from "./catalog-pusher";
+import { pushCatalogToRenderer } from "./catalog-pusher";
 import { catalogEntityRegistry } from "./catalog";
 import { HelmRepoManager } from "./helm/helm-repo-manager";
 import { syncWeblinks } from "./catalog-sources";
@@ -316,7 +316,7 @@ async function main(di: DiContainer) {
   }
 
   ipcMainOn(IpcRendererNavigationEvents.LOADED, async () => {
-    onCloseCleanup.push(startCatalogSyncToRenderer(catalogEntityRegistry));
+    onCloseCleanup.push(pushCatalogToRenderer(catalogEntityRegistry));
 
     const directoryForKubeConfigs = di.inject(directoryForKubeConfigsInjectable);
 

@@ -15,15 +15,15 @@ import { ConfirmDialog } from "../confirm-dialog";
 import { Icon } from "../icon";
 import { HotbarToggleMenuItem } from "./hotbar-toggle-menu-item";
 
-export interface CatalogEntityDrawerMenuProps<T extends CatalogEntity> extends MenuActionsProps {
-  entity: T;
+export interface CatalogEntityDrawerMenuProps extends MenuActionsProps {
+  entity: CatalogEntity | null | undefined;
 }
 
 @observer
-export class CatalogEntityDrawerMenu<T extends CatalogEntity> extends React.Component<CatalogEntityDrawerMenuProps<T>> {
+export class CatalogEntityDrawerMenu extends React.Component<CatalogEntityDrawerMenuProps> {
   @observable private contextMenu: CatalogEntityContextMenuContext;
 
-  constructor(props: CatalogEntityDrawerMenuProps<T>) {
+  constructor(props: CatalogEntityDrawerMenuProps) {
     super(props);
     makeObservable(this);
   }
@@ -53,7 +53,7 @@ export class CatalogEntityDrawerMenu<T extends CatalogEntity> extends React.Comp
     }
   }
 
-  getMenuItems(entity: T): React.ReactChild[] {
+  getMenuItems(entity: CatalogEntity): React.ReactChild[] {
     if (!entity) {
       return [];
     }

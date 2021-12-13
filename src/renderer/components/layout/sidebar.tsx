@@ -12,53 +12,33 @@ import { SidebarItem } from "./sidebar-item";
 import { catalogEntityRegistry } from "../../api/catalog-entity-registry";
 import { SidebarCluster } from "./sidebar-cluster";
 import { withInjectables } from "@ogre-tools/injectable-react";
-import sidebarItemsInjectable, {
-  HierarchicalSidebarItem,
-} from "./sidebar-items.injectable";
+import sidebarItemsInjectable, { type HierarchicalSidebarItem } from "./sidebar-items.injectable";
 import type { IComputedValue } from "mobx";
 
 interface Dependencies {
   sidebarItems: IComputedValue<HierarchicalSidebarItem[]>;
 }
 
-@observer
-class NonInjectedSidebar extends React.Component<Dependencies> {
-  static displayName = "Sidebar";
+const NonInjectedSidebar = observer(({ sidebarItems }: Dependencies) => (
+  <div className={cssNames("flex flex-col")} data-testid="cluster-sidebar">
+    <SidebarCluster entity={catalogEntityRegistry.activeEntity} />
 
-  get clusterEntity() {
-    return catalogEntityRegistry.activeEntity;
-  }
+    <div className={`${styles.sidebarNav} sidebar-active-status`}>
+      {sidebarItems.get().map(item => (
+        <SidebarItem
+          item={item}
+          key={item.registration.id}
+        />
+      ))}
+    </div>
+  </div>
+));
 
-  render() {
-    return (
-      <div className={cssNames("flex flex-col")} data-testid="cluster-sidebar">
-        <SidebarCluster clusterEntity={this.clusterEntity} />
+export const Sidebar = withInjectables<Dependencies>(NonInjectedSidebar, {
+  getProps: (di, props) => ({
+    ...props,
+    sidebarItems: di.inject(sidebarItemsInjectable),
+  }),
+});
 
-        <div className={`${styles.sidebarNav} sidebar-active-status`}>
-          {this.props.sidebarItems.get().map((
-            hierarchicalSidebarItem: HierarchicalSidebarItem,
-          ) => (
-            <SidebarItem
-              item={hierarchicalSidebarItem}
-              key={hierarchicalSidebarItem.registration.id}
-            />
-          ))}
-        </div>
-      </div>
-    );
-  }
-}
-
-export const Sidebar = withInjectables<Dependencies>(
-  NonInjectedSidebar,
-
-  {
-    getProps: (di, props) => ({
-      sidebarItems: di.inject(sidebarItemsInjectable),
-      ...props,
-    }),
-  },
-);
-
-
-
+Sidebar.displayName = "Sidebar";

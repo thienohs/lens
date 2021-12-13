@@ -10,13 +10,8 @@ import { toJS } from "./utils";
 import { CatalogEntity } from "./catalog";
 import logger from "../main/logger";
 import { broadcastMessage } from "./ipc";
-import {
-  defaultHotbarCells,
-  getEmptyHotbar,
-  Hotbar,
-  CreateHotbarData,
-  CreateHotbarOptions,
-} from "./hotbar-types";
+import { defaultHotbarCells, getEmptyHotbar, Hotbar, CreateHotbarData, CreateHotbarOptions } from "./hotbar-types";
+import { getShortName } from "./catalog/helpers";
 import { hotbarTooManyItemsChannel } from "./ipc/hotbar";
 import type { GeneralEntity } from "./catalog-entities";
 
@@ -88,12 +83,21 @@ export class HotbarStore extends BaseStore<HotbarStoreModel> {
     if (!data.hotbars || !data.hotbars.length) {
       const hotbar = getEmptyHotbar("Default");
       const {
-        metadata: { uid, name, source },
+        metadata: {
+          uid,
+          name,
+          source,
+        },
       } = this.dependencies.catalogCatalogEntity;
-      const initialItem = { entity: { uid, name, source }};
 
-      hotbar.items[0] = initialItem;
-
+      hotbar.items[0] = {
+        entity: {
+          uid,
+          name,
+          source,
+          shortName: getShortName(this.dependencies.catalogCatalogEntity),
+        },
+      };
       this.hotbars = [hotbar];
     } else {
       this.hotbars = data.hotbars;
@@ -176,6 +180,7 @@ export class HotbarStore extends BaseStore<HotbarStoreModel> {
     const hotbar = this.getActive();
     const uid = item.getId();
     const name = item.getName();
+    const shortName = getShortName(item);
 
     if (typeof uid !== "string") {
       throw new TypeError("CatalogEntity's ID must be a string");
@@ -183,6 +188,10 @@ export class HotbarStore extends BaseStore<HotbarStoreModel> {
 
     if (typeof name !== "string") {
       throw new TypeError("CatalogEntity's NAME must be a string");
+    }
+
+    if (typeof shortName !== "string") {
+      throw new TypeError("CatalogEntity's SHORT_NAME must be a string");
     }
 
     if (this.isAddedToActive(item)) {
@@ -193,6 +202,7 @@ export class HotbarStore extends BaseStore<HotbarStoreModel> {
       uid,
       name,
       source: item.metadata.source,
+      shortName,
     };
     const newItem = { entity };
 

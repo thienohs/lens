@@ -19,6 +19,8 @@ import { withInjectables } from "@ogre-tools/injectable-react";
 import hotbarStoreInjectable from "../../../common/hotbar-store.injectable";
 import type { HotbarStore } from "../../../common/hotbar-store";
 import { observer } from "mobx-react";
+import { getIconColourHash } from "../../../common/catalog/helpers";
+import { EntityIcon } from "../entity-icon";
 
 const contextMenu: CatalogEntityContextMenuContext = observable({
   menuItems: [],
@@ -52,11 +54,12 @@ function renderLoadingSidebarCluster() {
   return (
     <div className={styles.SidebarCluster}>
       <Avatar
-        title="??"
         background="var(--halfGray)"
         size={40}
         className={styles.loadingAvatar}
-      />
+      >
+        ??
+      </Avatar>
       <div className={styles.loadingClusterName} />
     </div>
   );
@@ -67,27 +70,27 @@ interface Dependencies {
 }
 
 interface SidebarClusterProps {
-  clusterEntity: CatalogEntity;
+  entity: CatalogEntity;
 }
 
-const NonInjectedSidebarCluster = observer(({ clusterEntity, hotbarStore }: Dependencies & SidebarClusterProps) => {
+const NonInjectedSidebarCluster = observer(({ entity, hotbarStore }: Dependencies & SidebarClusterProps) => {
   const [opened, setOpened] = useState(false);
 
-  if (!clusterEntity) {
+  if (!entity) {
     return renderLoadingSidebarCluster();
   }
 
   const onMenuOpen = () => {
-    const isAddedToActive = hotbarStore.isAddedToActive(clusterEntity);
+    const isAddedToActive = hotbarStore.isAddedToActive(entity);
     const title = isAddedToActive
       ? "Remove from Hotbar"
       : "Add to Hotbar";
     const onClick = isAddedToActive
-      ? () => hotbarStore.removeFromHotbar(clusterEntity.getId())
-      : () => hotbarStore.addToHotbar(clusterEntity);
+      ? () => hotbarStore.removeFromHotbar(entity.getId())
+      : () => hotbarStore.addToHotbar(entity);
 
     contextMenu.menuItems = [{ title, onClick }];
-    clusterEntity.onContextMenuOpen(contextMenu);
+    entity.onContextMenuOpen(contextMenu);
 
     toggle();
   };
@@ -102,7 +105,7 @@ const NonInjectedSidebarCluster = observer(({ clusterEntity, hotbarStore }: Depe
     setOpened(!opened);
   };
 
-  const id = `cluster-${clusterEntity.getId()}`;
+  const id = `cluster-${entity.getId()}`;
   const tooltipId = `tooltip-${id}`;
 
   return (
@@ -115,17 +118,17 @@ const NonInjectedSidebarCluster = observer(({ clusterEntity, hotbarStore }: Depe
       data-testid="sidebar-cluster-dropdown"
     >
       <Avatar
-        title={clusterEntity.getName()}
-        colorHash={`${clusterEntity.getName()}-${clusterEntity.metadata.source}`}
+        colorHash={getIconColourHash(entity)}
         size={40}
-        src={clusterEntity.spec.icon?.src}
         className={styles.avatar}
-      />
+      >
+        <EntityIcon entity={entity} />
+      </Avatar>
       <div className={styles.clusterName} id={tooltipId}>
-        {clusterEntity.getName()}
+        {entity.getName()}
       </div>
       <Tooltip targetId={tooltipId}>
-        {clusterEntity.getName()}
+        {entity.getName()}
       </Tooltip>
       <Icon material="arrow_drop_down" className={styles.dropdown}/>
       <Menu

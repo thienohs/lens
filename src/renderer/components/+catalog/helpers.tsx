@@ -8,6 +8,7 @@ import React from "react";
 import { KubeObject } from "../../../common/k8s-api/kube-object";
 import type { CatalogEntity } from "../../api/catalog-entity";
 import { Badge } from "../badge";
+import { navigation } from "../../navigation";
 import { searchUrlParam } from "../input";
 
 /**
@@ -23,7 +24,7 @@ export function getLabelBadges(entity: CatalogEntity, onClick?: (evt: React.Mous
         label={label}
         title={label}
         onClick={(event) => {
-          searchUrlParam.set(label);
+          navigation.searchParams.set(searchUrlParam.name, label);
           onClick?.(event);
           event.stopPropagation();
         }}

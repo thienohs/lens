@@ -6,15 +6,16 @@
 import * as uuid from "uuid";
 import { tuple, Tuple } from "./utils";
 
+export interface HotbarItemEntity {
+  uid: string;
+  name: string;
+  shortName: string;
+  source?: string;
+}
+
 export interface HotbarItem {
-  entity: {
-    uid: string;
-    name?: string;
-    source?: string;
-  };
-  params?: {
-    [key: string]: string;
-  };
+  entity: HotbarItemEntity;
+  params?: Partial<Record<string, string>>;
 }
 
 export type Hotbar = Required<CreateHotbarData>;
