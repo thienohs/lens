@@ -13,5 +13,4 @@ export function initRegistries() {
   registries.GlobalPageRegistry.createInstance();
   registries.KubeObjectDetailRegistry.createInstance();
   registries.KubeObjectStatusRegistry.createInstance();
-  registries.WorkloadsOverviewDetailRegistry.createInstance();
 }
