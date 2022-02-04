@@ -3,32 +3,15 @@
  * Licensed under MIT License. See LICENSE in root directory for more information.
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
-import { computed } from "mobx";
-import rendererExtensionsInjectable from "../../../extensions/renderer-extensions.injectable";
 import { KubernetesCluster, WebLink } from "../../../common/catalog-entities";
+import type { CatalogEntityDetailsProps } from "./catalog-entity-detail-registration";
 import { DrawerItem, DrawerTitle } from "../drawer";
 import React from "react";
-import type { CatalogEntity } from "../../../common/catalog";
-import { orderBy } from "lodash/fp";
-import type { CatalogEntityDetailRegistration, CatalogEntityDetailsProps } from "./catalog-entity-detail-registration";
 
-const detailItemRegistrationsInjectable = getInjectable({
-  instantiate: (di) => {
-    const extensions = di.inject(rendererExtensionsInjectable);
-
-    return computed(() => {
-      const extensionRegistrations = extensions
-        .get()
-        .flatMap((extension) => extension.catalogEntityDetailItems);
-
-      return orderByPriority([...coreRegistrations, ...extensionRegistrations]);
-    });
-  },
-
+const coreDetailItemRegistrationsInjectable = getInjectable({
+  instantiate: () => coreRegistrations,
   lifecycle: lifecycleEnum.singleton,
 });
-
-export default detailItemRegistrationsInjectable;
 
 const coreRegistrations = [
   {
@@ -66,11 +49,5 @@ const coreRegistrations = [
   },
 ];
 
-const orderByPriority = (
-  registrations: CatalogEntityDetailRegistration<CatalogEntity>[],
-) =>
-  orderBy(
-    "priority",
-    "desc",
-    registrations.map(({ priority = 50, ...rest }) => ({ priority, ...rest })),
-  );
+
+export default coreDetailItemRegistrationsInjectable;
