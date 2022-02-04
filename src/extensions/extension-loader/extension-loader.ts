@@ -249,7 +249,6 @@ export class ExtensionLoader {
       const removeItems = [
         registries.GlobalPageRegistry.getInstance().add(extension.globalPages, extension),
         registries.EntitySettingRegistry.getInstance().add(extension.entitySettings),
-        registries.CatalogEntityDetailRegistry.getInstance().add(extension.catalogEntityDetailItems),
       ];
 
       this.events.on("remove", (removedExtension: LensRendererExtension) => {

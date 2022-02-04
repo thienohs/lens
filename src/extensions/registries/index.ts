@@ -10,5 +10,4 @@ export * from "./page-menu-registry";
 export * from "./kube-object-detail-registry";
 export * from "./kube-object-status-registry";
 export * from "./entity-setting-registry";
-export * from "./catalog-entity-detail-registry";
 export * from "./protocol-handler";

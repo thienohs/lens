@@ -20,6 +20,7 @@ import type { AdditionalCategoryColumnRegistration } from "../renderer/component
 import type { CustomCategoryViewRegistration } from "../renderer/components/+catalog/custom-views";
 import type { StatusBarRegistration } from "../renderer/components/status-bar/status-bar-registration";
 import type { KubeObjectMenuRegistration } from "../renderer/components/kube-object-menu/dependencies/kube-object-menu-items/kube-object-menu-registration";
+import type { CatalogEntityDetailRegistration } from "../renderer/components/+catalog/catalog-entity-detail-registration";
 import type { WorkloadsOverviewDetailRegistration } from "../renderer/components/+workloads-overview/workloads-overview-detail-registration";
 
 export class LensRendererExtension extends LensExtension {
@@ -36,7 +37,7 @@ export class LensRendererExtension extends LensExtension {
   commands: CommandRegistration[] = [];
   welcomeMenus: WelcomeMenuRegistration[] = [];
   welcomeBanners: WelcomeBannerRegistration[] = [];
-  catalogEntityDetailItems: registries.CatalogEntityDetailRegistration<CatalogEntity>[] = [];
+  catalogEntityDetailItems: CatalogEntityDetailRegistration<CatalogEntity>[] = [];
   topBarItems: TopBarRegistration[] = [];
   additionalCategoryColumns: AdditionalCategoryColumnRegistration[] = [];
   customCategoryViews: CustomCategoryViewRegistration[] = [];

@@ -10,11 +10,13 @@ import { Drawer, DrawerItem } from "../drawer";
 import type { CatalogCategory, CatalogEntity } from "../../../common/catalog";
 import { Icon } from "../icon";
 import { CatalogEntityDrawerMenu } from "./catalog-entity-drawer-menu";
-import { CatalogEntityDetailRegistry } from "../../../extensions/registries";
 import { isDevelopment } from "../../../common/vars";
 import { cssNames } from "../../utils";
 import { Avatar } from "../avatar";
 import { getLabelBadges } from "./helpers";
+import detailsForCatalogEntityInjectable from "./details-for-catalog-entity.injectable";
+import { withInjectables } from "@ogre-tools/injectable-react";
+import type { CatalogEntityDetailsProps } from "./catalog-entity-detail-registration";
 
 interface Props<T extends CatalogEntity> {
   entity: T;
@@ -22,8 +24,12 @@ interface Props<T extends CatalogEntity> {
   onRun: () => void;
 }
 
+interface Dependencies<TEntity extends CatalogEntity> {
+  details: { defaultIsShown: boolean, components: React.ComponentType<CatalogEntityDetailsProps<TEntity>>[] }
+}
+
 @observer
-export class CatalogEntityDetails<T extends CatalogEntity> extends Component<Props<T>> {
+class NonInjectedCatalogEntityDetails<T extends CatalogEntity> extends Component<Dependencies<T> & Props<T>> {
   categoryIcon(category: CatalogCategory) {
     if (Icon.isSvg(category.metadata.icon)) {
       return <Icon svg={category.metadata.icon} smallest />;
@@ -34,13 +40,10 @@ export class CatalogEntityDetails<T extends CatalogEntity> extends Component<Pro
 
   renderContent(entity: T) {
     const { onRun, hideDetails } = this.props;
-    const detailItems = CatalogEntityDetailRegistry.getInstance().getItemsForKind(entity.kind, entity.apiVersion);
-    const details = detailItems.map(({ components }, index) => <components.Details entity={entity} key={index} />);
-    const showDefaultDetails = detailItems.find((item) => item.priority > 999) === undefined;
 
     return (
       <>
-        {showDefaultDetails && (
+        {this.props.details.defaultIsShown && (
           <div className="flex">
             <div className={styles.entityIcon}>
               <Avatar
@@ -86,7 +89,9 @@ export class CatalogEntityDetails<T extends CatalogEntity> extends Component<Pro
           </div>
         )}
         <div className="box grow">
-          {details}
+          {this.props.details.components.map((Details, index) => (
+            <Details entity={entity} key={index} />
+          ))}
         </div>
       </>
     );
@@ -109,3 +114,18 @@ export class CatalogEntityDetails<T extends CatalogEntity> extends Component<Pro
     );
   }
 }
+
+const InjectedCatalogEntityDetails = withInjectables<Dependencies<CatalogEntity>, Props<CatalogEntity>>(
+  NonInjectedCatalogEntityDetails,
+
+  {
+    getProps: (di, props) => ({
+      details: di.inject(detailsForCatalogEntityInjectable, props.entity),
+      ...props,
+    }),
+  },
+);
+
+export const CatalogEntityDetails = <T extends CatalogEntity>(
+  props: Props<T>,
+) => <InjectedCatalogEntityDetails {...props} />;

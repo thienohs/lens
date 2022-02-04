@@ -2,10 +2,7 @@
  * Copyright (c) OpenLens Authors. All rights reserved.
  * Licensed under MIT License. See LICENSE in root directory for more information.
  */
-
-import type React from "react";
-import type { CatalogEntity } from "../common-api/catalog";
-import { BaseRegistry } from "./base-registry";
+import type { CatalogEntity } from "../../../common/catalog";
 
 export interface CatalogEntityDetailsProps<T extends CatalogEntity> {
   entity: T;
@@ -20,14 +17,4 @@ export interface CatalogEntityDetailRegistration<T extends CatalogEntity> {
   apiVersions: string[];
   components: CatalogEntityDetailComponents<T>;
   priority?: number;
-}
-
-export class CatalogEntityDetailRegistry extends BaseRegistry<CatalogEntityDetailRegistration<CatalogEntity>> {
-  getItemsForKind(kind: string, apiVersion: string) {
-    const items = this.getItems().filter((item) => {
-      return item.kind === kind && item.apiVersions.includes(apiVersion);
-    });
-
-    return items.sort((a, b) => (b.priority ?? 50) - (a.priority ?? 50));
-  }
 }
