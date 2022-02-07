@@ -4,16 +4,17 @@
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import { KubernetesCluster, WebLink } from "../../../common/catalog-entities";
-import type { CatalogEntityDetailsProps } from "./catalog-entity-detail-registration";
+import type { CatalogEntityDetailsProps, CatalogEntityDetailRegistration } from "./catalog-entity-detail-registration";
 import { DrawerItem, DrawerTitle } from "../drawer";
 import React from "react";
+import type { CatalogEntity } from "../../../common/catalog";
 
 const coreDetailItemRegistrationsInjectable = getInjectable({
   instantiate: () => coreRegistrations,
   lifecycle: lifecycleEnum.singleton,
 });
 
-const coreRegistrations = [
+const coreRegistrations: CatalogEntityDetailRegistration<CatalogEntity>[] = [
   {
     apiVersions: [KubernetesCluster.apiVersion],
     kind: KubernetesCluster.kind,
