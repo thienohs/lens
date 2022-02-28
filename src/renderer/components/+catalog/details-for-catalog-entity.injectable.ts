@@ -8,6 +8,8 @@ import detailItemRegistrationsInjectable from "./detail-item-registrations.injec
 import { conforms, eq, includes } from "lodash/fp";
 
 const detailsForCatalogEntityInjectable = getInjectable({
+  id: "details-for-catalog-entity",
+
   instantiate: (di, catalogEntity: CatalogEntity) => {
     const allRegistrations = di.inject(detailItemRegistrationsInjectable);
 

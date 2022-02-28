@@ -9,6 +9,8 @@ import coreDetailItemRegistrationsInjectable from "./core-detail-item-registrati
 import { orderByPriority } from "../../utils/order-by-priority";
 
 const detailItemRegistrationsInjectable = getInjectable({
+  id: "detail-item-registrations",
+
   instantiate: (di) => {
     const extensions = di.inject(rendererExtensionsInjectable);
     const coreRegistrations = di.inject(coreDetailItemRegistrationsInjectable);

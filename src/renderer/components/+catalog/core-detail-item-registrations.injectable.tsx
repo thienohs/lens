@@ -10,6 +10,7 @@ import React from "react";
 import type { CatalogEntity } from "../../../common/catalog";
 
 const coreDetailItemRegistrationsInjectable = getInjectable({
+  id: "core-detail-item-registrations",
   instantiate: () => coreRegistrations,
   lifecycle: lifecycleEnum.singleton,
 });
