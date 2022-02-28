@@ -25,7 +25,10 @@ interface Props<T extends CatalogEntity> {
 }
 
 interface Dependencies<TEntity extends CatalogEntity> {
-  details: { defaultIsShown: boolean, components: React.ComponentType<CatalogEntityDetailsProps<TEntity>>[] }
+  details: {
+    defaultIsShown: boolean;
+    components: React.ComponentType<CatalogEntityDetailsProps<TEntity>>[];
+  };
 }
 
 @observer

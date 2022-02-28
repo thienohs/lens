@@ -5,7 +5,7 @@
 import { orderBy } from "lodash/fp";
 
 interface ItemWithPriority {
-  priority?: number
+  priority?: number;
 }
 
 export const orderByPriority = <T extends ItemWithPriority>(items: T[]) =>
