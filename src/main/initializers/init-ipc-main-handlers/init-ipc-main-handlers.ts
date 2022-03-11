@@ -13,7 +13,7 @@ import { broadcastMainChannel, broadcastMessage, ipcMainHandle, ipcMainOn } from
 import { catalogEntityRegistry } from "../../catalog";
 import { pushCatalogToRenderer } from "../../catalog-pusher";
 import { ClusterManager } from "../../cluster-manager";
-import { ResourceApplier } from "../../resource-applier";
+import { ResourceApplier } from "../../k8s/resource-applier/applier";
 import { remove } from "fs-extra";
 import { onLocationChange, handleWindowAction } from "../../ipc/window";
 import { openFilePickingDialogChannel } from "../../../common/ipc/dialog";
