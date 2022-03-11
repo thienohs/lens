@@ -7,6 +7,7 @@ import directoryForLensLocalStorageInjectable from "../../../common/directory-fo
 import { initIpcMainHandlers } from "./init-ipc-main-handlers";
 import getAbsolutePathInjectable from "../../../common/path/get-absolute-path.injectable";
 import applicationMenuItemsInjectable from "../../menu/application-menu-items.injectable";
+import createK8sResourceApplierInjectable from "../../k8s/resource-applier/create.injectable";
 
 const initIpcMainHandlersInjectable = getInjectable({
   id: "init-ipc-main-handlers",
@@ -15,6 +16,7 @@ const initIpcMainHandlersInjectable = getInjectable({
     applicationMenuItems: di.inject(applicationMenuItemsInjectable),
     directoryForLensLocalStorage: di.inject(directoryForLensLocalStorageInjectable),
     getAbsolutePath: di.inject(getAbsolutePathInjectable),
+    createK8sResourceApplier: di.inject(createK8sResourceApplierInjectable),
   }),
 });
 
