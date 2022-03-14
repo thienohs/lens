@@ -21,6 +21,8 @@ import type { DeleteClusterDialogModel } from "../delete-cluster-dialog-model/de
 import type { DiRender } from "../../test-utils/renderFor";
 import { renderFor } from "../../test-utils/renderFor";
 import hotbarStoreInjectable from "../../../../common/hotbar-store.injectable";
+import readFileSyncInjectable from "../../../../common/fs/read-file-sync.injectable";
+import { readFileSync } from "fs";
 
 jest.mock("electron", () => ({
   app: {
@@ -89,12 +91,11 @@ users:
     token: kubeconfig-user-q4lm4:xxxyyyy
 `;
 
-let config: KubeConfig;
-
 describe("<DeleteClusterDialog />", () => {
   let createCluster: (model: ClusterModel) => Cluster;
   let deleteClusterDialogModel: DeleteClusterDialogModel;
   let render: DiRender;
+  let config: KubeConfig;
 
   beforeEach(async () => {
     const { mainDi, rendererDi, runSetups } = getDisForUnitTesting({ doGeneralOverrides: true });
@@ -110,6 +111,8 @@ describe("<DeleteClusterDialog />", () => {
     await runSetups();
 
     deleteClusterDialogModel = rendererDi.inject(deleteClusterDialogModelInjectable);
+    mainDi.override(readFileSyncInjectable, () => readFileSync);
+
     createCluster = mainDi.inject(createClusterInjectionToken);
   });
 

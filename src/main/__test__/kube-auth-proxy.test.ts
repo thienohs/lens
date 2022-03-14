@@ -54,6 +54,8 @@ import path from "path";
 import spawnInjectable from "../child-process/spawn.injectable";
 import getConfigurationFileModelInjectable from "../../common/get-configuration-file-model/get-configuration-file-model.injectable";
 import appVersionInjectable from "../../common/get-configuration-file-model/app-version/app-version.injectable";
+import readFileSyncInjectable from "../../common/fs/read-file-sync.injectable";
+import { readFileSync } from "fs";
 
 console = new Console(stdout, stderr);
 
@@ -105,8 +107,8 @@ describe("kube auth proxy tests", () => {
 
     await di.runSetups();
 
+    di.override(readFileSyncInjectable, () => readFileSync); // TODO: don't bypass injectables
     createCluster = di.inject(createClusterInjectionToken);
-
     createKubeAuthProxy = di.inject(createKubeAuthProxyInjectable);
 
     UserStore.createInstance();
