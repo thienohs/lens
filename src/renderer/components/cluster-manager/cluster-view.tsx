@@ -42,7 +42,7 @@ class NonInjectedClusterView extends React.Component<Dependencies> {
   @computed get isReady(): boolean {
     const { cluster, clusterId } = this;
 
-    return cluster?.ready && cluster?.available && ClusterFrameHandler.getInstance().hasLoadedView(clusterId);
+    return Boolean(cluster?.ready && cluster?.available && ClusterFrameHandler.getInstance().hasLoadedView(clusterId));
   }
 
   componentDidMount() {
@@ -51,7 +51,7 @@ class NonInjectedClusterView extends React.Component<Dependencies> {
 
   componentWillUnmount() {
     ClusterFrameHandler.getInstance().clearVisibleCluster();
-    catalogEntityRegistry.activeEntity = null;
+    catalogEntityRegistry.activeEntity = undefined;
   }
 
   bindEvents() {

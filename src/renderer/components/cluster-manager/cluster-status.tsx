@@ -68,7 +68,7 @@ class NonInjectedClusterStatus extends React.Component<ClusterStatusProps & Depe
       await requestClusterActivation(this.cluster.id, true);
     } catch (error) {
       this.authOutput.push({
-        message: error.toString(),
+        message: String(error),
         isError: true,
       });
     } finally {

@@ -16,7 +16,7 @@ import { KubeObjectMeta } from "../kube-object-meta";
 import { Input } from "../input";
 import { AdditionalPrinterColumnsV1, CustomResourceDefinition } from "../../../common/k8s-api/endpoints/crd.api";
 import { parseJsonPath } from "../../utils/jsonPath";
-import { KubeObject, KubeObjectMetadata, KubeObjectStatus } from "../../../common/k8s-api/kube-object";
+import { KubeObject, KubeObjectStatus } from "../../../common/k8s-api/kube-object";
 import logger from "../../../common/logger";
 
 export interface CustomResourceDetailsProps extends KubeObjectDetailsProps<KubeObject> {
@@ -47,25 +47,32 @@ function convertSpecValue(value: any): any {
 export class CustomResourceDetails extends React.Component<CustomResourceDetailsProps> {
   renderAdditionalColumns(resource: KubeObject, columns: AdditionalPrinterColumnsV1[]) {
     return columns.map(({ name, jsonPath: jp }) => (
-      <DrawerItem key={name} name={name} renderBoolean>
+      <DrawerItem key={name}
+        name={name}
+        renderBoolean>
         {convertSpecValue(jsonPath.value(resource, parseJsonPath(jp.slice(1))))}
       </DrawerItem>
     ));
   }
 
-  renderStatus(customResource: KubeObject<KubeObjectMetadata, KubeObjectStatus, any>, columns: AdditionalPrinterColumnsV1[]) {
+  renderStatus(customResource: KubeObject<KubeObjectStatus, unknown>, columns: AdditionalPrinterColumnsV1[]) {
     const showStatus = !columns.find(column => column.name == "Status") && Array.isArray(customResource.status?.conditions);
 
     if (!showStatus) {
       return null;
     }
 
-    const conditions = customResource.status.conditions
-      .filter(({ type, reason }) => type || reason)
-      .map(({ type, reason, message, status }) => ({ kind: type || reason, message, status }))
+    const conditions = customResource.status?.conditions
+      ?.filter(({ type, reason }) => type || reason)
+      .map(({ type, reason, message, status }) => ({
+        kind: type || reason || "<unknown>",
+        message,
+        status,
+      }))
       .map(({ kind, message, status }, index) => (
         <Badge
-          key={kind + index} label={kind}
+          key={kind + index}
+          label={kind}
           disabled={status === "False"}
           className={kind.toLowerCase()}
           tooltip={message}
@@ -73,7 +80,9 @@ export class CustomResourceDetails extends React.Component<CustomResourceDetails
       ));
 
     return (
-      <DrawerItem name="Status" className="status" labelsOnly>
+      <DrawerItem name="Status"
+        className="status"
+        labelsOnly>
         {conditions}
       </DrawerItem>
     );

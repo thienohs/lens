@@ -139,6 +139,16 @@ module.exports = {
             "requireLast": false,
           },
         }],
+        "react/jsx-max-props-per-line": ["error", {
+          "maximum": {
+            "single": 2,
+            "multi": 1,
+          },
+        }],
+        "react/jsx-one-expression-per-line": ["error", {
+          "allow": "single-child",
+        }],
+        "react/jsx-tag-spacing": ["error"],
         "react/display-name": "off",
         "space-before-function-paren": "off",
         "@typescript-eslint/space-before-function-paren": ["error", {

@@ -6,9 +6,9 @@
 import React from "react";
 import { cssNames } from "../../utils";
 import { MenuActions, MenuActionsProps } from "../menu/menu-actions";
-import type { CatalogEntity, CatalogEntityContextMenu, CatalogEntityContextMenuContext } from "../../api/catalog-entity";
+import type { CatalogEntity, CatalogEntityContextMenu } from "../../api/catalog-entity";
 import { observer } from "mobx-react";
-import { makeObservable, observable } from "mobx";
+import { observable } from "mobx";
 import { navigate } from "../../navigation";
 import { MenuItem } from "../menu";
 import { ConfirmDialog } from "../confirm-dialog";
@@ -21,19 +21,13 @@ export interface CatalogEntityDrawerMenuProps<T extends CatalogEntity> extends M
 
 @observer
 export class CatalogEntityDrawerMenu<T extends CatalogEntity> extends React.Component<CatalogEntityDrawerMenuProps<T>> {
-  @observable private contextMenu: CatalogEntityContextMenuContext;
-
-  constructor(props: CatalogEntityDrawerMenuProps<T>) {
-    super(props);
-    makeObservable(this);
-  }
+  private readonly menuItems = observable.array<CatalogEntityContextMenu>();
 
   componentDidMount() {
-    this.contextMenu = {
-      menuItems: [],
-      navigate: (url: string) => navigate(url),
-    };
-    this.props.entity?.onContextMenuOpen(this.contextMenu);
+    this.props.entity?.onContextMenuOpen({
+      menuItems: this.menuItems,
+      navigate: (url) => navigate(url),
+    });
   }
 
   onMenuItemClick(menuItem: CatalogEntityContextMenu) {
@@ -60,7 +54,7 @@ export class CatalogEntityDrawerMenu<T extends CatalogEntity> extends React.Comp
 
     const items: React.ReactChild[] = [];
 
-    for (const menuItem of this.contextMenu.menuItems) {
+    for (const menuItem of this.menuItems) {
       if (!menuItem.icon) {
         continue;
       }
@@ -82,8 +76,14 @@ export class CatalogEntityDrawerMenu<T extends CatalogEntity> extends React.Comp
       <HotbarToggleMenuItem
         key="hotbar-toggle"
         entity={entity}
-        addContent={<Icon material="push_pin" interactive small tooltip="Add to Hotbar"/>}
-        removeContent={<Icon svg="push_off" interactive small tooltip="Remove from Hotbar"/>}
+        addContent={<Icon material="push_pin"
+          interactive
+          small
+          tooltip="Add to Hotbar"/>}
+        removeContent={<Icon svg="push_off"
+          interactive
+          small
+          tooltip="Remove from Hotbar"/>}
       />,
     );
 
@@ -93,7 +93,7 @@ export class CatalogEntityDrawerMenu<T extends CatalogEntity> extends React.Comp
   render() {
     const { className, entity, ...menuProps } = this.props;
 
-    if (!this.contextMenu || !entity.isEnabled()) {
+    if (!this.menuItems.length || !entity.isEnabled()) {
       return null;
     }
 

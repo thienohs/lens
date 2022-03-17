@@ -16,12 +16,10 @@ import { getDiForUnitTesting } from "../../../getDiForUnitTesting";
 import dockStoreInjectable from "../dock/store.injectable";
 import type { DiRender } from "../../test-utils/renderFor";
 import { renderFor } from "../../test-utils/renderFor";
-import directoryForUserDataInjectable
-  from "../../../../common/app-paths/directory-for-user-data/directory-for-user-data.injectable";
-import getConfigurationFileModelInjectable
-  from "../../../../common/get-configuration-file-model/get-configuration-file-model.injectable";
-import appVersionInjectable
-  from "../../../../common/get-configuration-file-model/app-version/app-version.injectable";
+import directoryForUserDataInjectable from "../../../../common/app-paths/directory-for-user-data/directory-for-user-data.injectable";
+import getConfigurationFileModelInjectable from "../../../../common/get-configuration-file-model/get-configuration-file-model.injectable";
+import appVersionInjectable from "../../../../common/get-configuration-file-model/app-version/app-version.injectable";
+import assert from "assert";
 
 jest.mock("electron", () => ({
   app: {
@@ -122,6 +120,8 @@ describe("<DockTabs />", () => {
     const { container, getByText } = render(getComponent(dockStore));
     const tab = container.querySelector(".Tab");
 
+    assert(tab);
+
     fireEvent.contextMenu(tab);
     expect(getByText("Close all tabs")).toBeInTheDocument();
   });
@@ -132,6 +132,8 @@ describe("<DockTabs />", () => {
     );
 
     const tab = container.querySelector(".Tab");
+
+    assert(tab);
 
     fireEvent.contextMenu(tab);
     fireEvent.click(getByText("Close"));
@@ -168,6 +170,8 @@ describe("<DockTabs />", () => {
     const { container, getByText, rerender } = render(getComponent(dockStore));
     const tab = container.querySelector(".Tab");
 
+    assert(tab);
+
     fireEvent.contextMenu(tab);
     const command = getByText("Close all tabs");
 
@@ -197,6 +201,8 @@ describe("<DockTabs />", () => {
     }];
     const { container, getByText } = render(getComponent(dockStore));
     const tab = container.querySelector(".Tab");
+
+    assert(tab);
 
     fireEvent.contextMenu(tab);
     const closeAll = getByText("Close all tabs");

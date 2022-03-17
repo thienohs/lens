@@ -4,12 +4,17 @@
  */
 
 import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
-import { Secret, secretsApi } from "../../../common/k8s-api/endpoints";
+import { Secret, SecretApi, SecretData, secretApi } from "../../../common/k8s-api/endpoints";
 import { apiManager } from "../../../common/k8s-api/api-manager";
+import { isClusterPageContext } from "../../utils";
 
-export class SecretsStore extends KubeObjectStore<Secret> {
-  api = secretsApi;
+export class SecretStore extends KubeObjectStore<Secret, SecretApi, SecretData> {
 }
 
-export const secretsStore = new SecretsStore();
-apiManager.registerStore(secretsStore);
+export const secretStore = isClusterPageContext()
+  ? new SecretStore(secretApi)
+  : undefined as never;
+
+if (isClusterPageContext()) {
+  apiManager.registerStore(secretStore);
+}

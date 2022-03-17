@@ -15,8 +15,15 @@ describe("Crds", () => {
           name: "foo",
           resourceVersion: "12345",
           uid: "12345",
+          selfLink: "/apis/apiextensions.k8s.io/v1/customresourcedefinitions/foo",
         },
         spec: {
+          group: "foo.bar",
+          names: {
+            kind: "Foo",
+            plural: "foos",
+          },
+          scope: "Namespaced",
           versions: [
             {
               name: "123",
@@ -43,8 +50,15 @@ describe("Crds", () => {
           name: "foo",
           resourceVersion: "12345",
           uid: "12345",
+          selfLink: "/apis/apiextensions.k8s.io/v1/customresourcedefinitions/foo",
         },
         spec: {
+          group: "foo.bar",
+          names: {
+            kind: "Foo",
+            plural: "foos",
+          },
+          scope: "Namespaced",
           versions: [
             {
               name: "123",
@@ -71,8 +85,15 @@ describe("Crds", () => {
           name: "foo",
           resourceVersion: "12345",
           uid: "12345",
+          selfLink: "/apis/apiextensions.k8s.io/v1/customresourcedefinitions/foo",
         },
         spec: {
+          group: "foo.bar",
+          names: {
+            kind: "Foo",
+            plural: "foos",
+          },
+          scope: "Namespaced",
           versions: [
             {
               name: "123",
@@ -99,8 +120,15 @@ describe("Crds", () => {
           name: "foo",
           resourceVersion: "12345",
           uid: "12345",
+          selfLink: "/apis/apiextensions.k8s.io/v1/customresourcedefinitions/foo",
         },
         spec: {
+          group: "foo.bar",
+          names: {
+            kind: "Foo",
+            plural: "foos",
+          },
+          scope: "Namespaced",
           version: "abc",
           versions: [
             {
@@ -128,6 +156,7 @@ describe("Crds", () => {
           name: "foo",
           resourceVersion: "12345",
           uid: "12345",
+          selfLink: "/apis/apiextensions.k8s.io/v1/customresourcedefinitions/foo",
         },
         spec: {
           version: "abc",

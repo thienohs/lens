@@ -389,7 +389,7 @@ describe("HotbarStore", () => {
     it("allows to retrieve a hotbar", () => {
       const hotbar = hotbarStore.getById("3caac17f-aec2-4723-9694-ad204465d935");
 
-      expect(hotbar.id).toBe("3caac17f-aec2-4723-9694-ad204465d935");
+      expect(hotbar?.id).toBe("3caac17f-aec2-4723-9694-ad204465d935");
     });
 
     it("clears cells without entity", () => {

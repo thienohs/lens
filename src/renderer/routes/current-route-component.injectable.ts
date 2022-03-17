@@ -25,7 +25,7 @@ const currentRouteComponentInjectable = getInjectable({
         .injectMany(routeSpecificComponentInjectionToken)
         .find(matches({ route: currentRoute }));
 
-      return routeSpecificComponent.Component;
+      return routeSpecificComponent?.Component;
     });
   },
 });

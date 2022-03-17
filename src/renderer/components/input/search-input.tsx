@@ -44,7 +44,7 @@ export class SearchInput extends React.Component<SearchInputProps> {
   @boundMethod
   onGlobalKey(evt: KeyboardEvent) {
     if (evt.key === "f" && (isMac ? evt.metaKey : evt.ctrlKey)) {
-      this.inputRef.current.focus();
+      this.inputRef.current?.focus();
     }
   }
 
@@ -63,7 +63,7 @@ export class SearchInput extends React.Component<SearchInputProps> {
     if (this.props.onClear) {
       this.props.onClear();
     } else {
-      this.inputRef.current.setValue("");
+      this.inputRef.current?.setValue("");
     }
   }
 
@@ -72,7 +72,9 @@ export class SearchInput extends React.Component<SearchInputProps> {
     let rightIcon = <Icon small material="search"/>;
 
     if (showClearIcon && value) {
-      rightIcon = <Icon small material="close" onClick={this.clear}/>;
+      rightIcon = <Icon small
+        material="close"
+        onClick={this.clear}/>;
     }
 
     return (

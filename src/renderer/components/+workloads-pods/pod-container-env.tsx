@@ -10,8 +10,8 @@ import { observer } from "mobx-react";
 import type { IPodContainer, Secret } from "../../../common/k8s-api/endpoints";
 import { DrawerItem } from "../drawer";
 import { autorun } from "mobx";
-import { secretsStore } from "../+config-secrets/secrets.store";
-import { configMapsStore } from "../+config-maps/config-maps.store";
+import { secretStore } from "../+config-secrets/secrets.store";
+import { configMapStore } from "../+config-maps/config-maps.store";
 import { Icon } from "../icon";
 import { base64, cssNames, iter } from "../../utils";
 import _ from "lodash";
@@ -22,22 +22,22 @@ export interface ContainerEnvironmentProps {
 }
 
 export const ContainerEnvironment = observer((props: ContainerEnvironmentProps) => {
-  const { container: { env, envFrom }, namespace } = props;
+  const { container: { env, envFrom = [] }, namespace } = props;
 
   useEffect( () => autorun(() => {
     for (const { valueFrom } of env ?? []) {
       if (valueFrom?.configMapKeyRef) {
-        configMapsStore.load({ name: valueFrom.configMapKeyRef.name, namespace });
+        configMapStore.load({ name: valueFrom.configMapKeyRef.name, namespace });
       }
     }
 
     for (const { configMapRef, secretRef } of envFrom ?? []) {
       if (secretRef?.name) {
-        secretsStore.load({ name: secretRef.name, namespace });
+        secretStore.load({ name: secretRef.name, namespace });
       }
 
       if (configMapRef?.name) {
-        configMapsStore.load({ name: configMapRef.name, namespace });
+        configMapStore.load({ name: configMapRef.name, namespace });
       }
     }
   }), []);
@@ -73,7 +73,7 @@ export const ContainerEnvironment = observer((props: ContainerEnvironmentProps) 
 
         if (configMapKeyRef) {
           const { name, key } = configMapKeyRef;
-          const configMap = configMapsStore.getByName(name, namespace);
+          const configMap = configMapStore.getByName(name, namespace);
 
           secretValue = configMap ?
             configMap.data[key] :
@@ -104,7 +104,7 @@ export const ContainerEnvironment = observer((props: ContainerEnvironmentProps) 
   };
 
   const renderEnvFromConfigMap = (configMapName: string) => {
-    const configMap = configMapsStore.getByName(configMapName, namespace);
+    const configMap = configMapStore.getByName(configMapName, namespace);
 
     if (!configMap) return null;
 
@@ -116,7 +116,7 @@ export const ContainerEnvironment = observer((props: ContainerEnvironmentProps) 
   };
 
   const renderEnvFromSecret = (secretName: string) => {
-    const secret = secretsStore.getByName(secretName, namespace);
+    const secret = secretStore.getByName(secretName, namespace);
 
     if (!secret) return null;
 
@@ -165,14 +165,16 @@ const SecretKey = (props: SecretKeyProps) => {
   const showKey = async (evt: React.MouseEvent) => {
     evt.preventDefault();
     setLoading(true);
-    const secret = await secretsStore.load({ name, namespace });
+    const secret = await secretStore.load({ name, namespace });
 
     setLoading(false);
     setSecret(secret);
   };
 
-  if (secret?.data?.[key]) {
-    return <>{base64.decode(secret.data[key])}</>;
+  const value = secret?.data?.[key];
+
+  if (value) {
+    return <>{base64.decode(value)}</>;
   }
 
   return (

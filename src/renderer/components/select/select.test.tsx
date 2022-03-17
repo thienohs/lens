@@ -67,7 +67,13 @@ describe("<Select />", () => {
 
     const onChange = jest.fn();
 
-    const { container } = render(<Select id="some-test-input" onChange={onChange} options={options} />);
+    const { container } = render((
+      <Select
+        id="some-test-input"
+        onChange={onChange}
+        options={options}
+      />
+    ));
 
     expect(container).toBeInstanceOf(HTMLElement);
   });
@@ -86,10 +92,16 @@ describe("<Select />", () => {
 
     const onChange = jest.fn();
 
-    const { container } = render(<Select id="some-test-input" value={options[0].value} onChange={onChange} options={options} />);
+    const { container } = render((
+      <Select
+        value={options[0]}
+        onChange={onChange}
+        options={options}
+      />
+    ));
     const selectedValueContainer = container.querySelector(".Select__single-value");
 
-    expect(selectedValueContainer.textContent).toBe(options[0].label);
+    expect(selectedValueContainer?.textContent).toBe(options[0].label);
   });
 
   it("should reflect to change value", async () => {
@@ -106,14 +118,22 @@ describe("<Select />", () => {
 
     const onChange = jest.fn();
 
-    const { container, rerender } = render(<Select id="some-test-input" value={options[0].value} onChange={onChange} options={options} />);
+    const { container, rerender } = render(<Select value={options[0]}
+      onChange={onChange}
+      options={options} />);
     const selectedValueContainer = container.querySelector(".Select__single-value");
 
-    expect(selectedValueContainer.textContent).toBe(options[0].label);
+    expect(selectedValueContainer?.textContent).toBe(options[0].label);
 
-    rerender(<Select id="some-test-input" value={options[1].value} onChange={onChange} options={options} />);
+    rerender((
+      <Select
+        value={options[1]}
+        onChange={onChange}
+        options={options}
+      />
+    ));
 
-    expect(container.querySelector(".Select__single-value").textContent).toBe(options[1].label);
+    expect(container.querySelector(".Select__single-value")?.textContent).toBe(options[1].label);
   });
 
   it("should unselect value if null is passed as a value", async () => {
@@ -130,12 +150,24 @@ describe("<Select />", () => {
 
     const onChange = jest.fn();
 
-    const { container, rerender } = render(<Select id="some-test-input" value={options[0].value} onChange={onChange} options={options} />);
+    const { container, rerender } = render((
+      <Select
+        value={options[0]}
+        onChange={onChange}
+        options={options}
+      />
+    ));
     const selectedValueContainer = container.querySelector(".Select__single-value");
 
-    expect(selectedValueContainer.textContent).toBe(options[0].label);
+    expect(selectedValueContainer?.textContent).toBe(options[0].label);
 
-    rerender(<Select id="some-test-input" value={null} onChange={onChange} options={options} />);
+    rerender((
+      <Select
+        value={null}
+        onChange={onChange}
+        options={options}
+      />
+    ));
 
     expect(container.querySelector(".Select__single-value")).not.toBeInTheDocument();
   });
@@ -154,12 +186,24 @@ describe("<Select />", () => {
 
     const onChange = jest.fn();
 
-    const { container, rerender } = render(<Select id="some-test-input" value={options[0].value} onChange={onChange} options={options} />);
+    const { container, rerender } = render((
+      <Select
+        value={options[0]}
+        onChange={onChange}
+        options={options}
+      />
+    ));
     const selectedValueContainer = container.querySelector(".Select__single-value");
 
-    expect(selectedValueContainer.textContent).toBe(options[0].label);
+    expect(selectedValueContainer?.textContent).toBe(options[0].label);
 
-    rerender(<Select id="some-test-input" value={undefined} onChange={onChange} options={options} />);
+    rerender((
+      <Select
+        value={undefined}
+        onChange={onChange}
+        options={options}
+      />
+    ));
 
     expect(container.querySelector(".Select__single-value")).not.toBeInTheDocument();
   });

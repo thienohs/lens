@@ -54,7 +54,7 @@ export class AddRoleDialog extends React.Component<AddRoleDialogProps> {
       this.reset();
       AddRoleDialog.close();
     } catch (err) {
-      Notifications.error(err.toString());
+      Notifications.checkedError(err, "Unknown error occured while creating role");
     }
   };
 
@@ -77,7 +77,8 @@ export class AddRoleDialog extends React.Component<AddRoleDialogProps> {
           >
             <SubTitle title="Role Name" />
             <Input
-              required autoFocus
+              required
+              autoFocus
               placeholder="Name"
               iconLeft="supervisor_account"
               value={this.roleName}
@@ -88,7 +89,7 @@ export class AddRoleDialog extends React.Component<AddRoleDialogProps> {
               id="add-dialog-namespace-select-input"
               themeName="light"
               value={this.namespace}
-              onChange={({ value }) => this.namespace = value}
+              onChange={namespace => this.namespace = namespace ?? "default"}
             />
           </WizardStep>
         </Wizard>

@@ -55,6 +55,7 @@ import shellApiRequestInjectable from "./proxy-functions/shell-api-request/shell
 import userStoreInjectable from "../common/user-store/user-store.injectable";
 import trayMenuItemsInjectable from "./tray/tray-menu-items.injectable";
 import { broadcastNativeThemeOnUpdate } from "./native-theme";
+import assert from "assert";
 import windowManagerInjectable from "./window-manager.injectable";
 import navigateToPreferencesInjectable from "../common/front-end-routing/routes/preferences/navigate-to-preferences.injectable";
 import syncGeneralCatalogEntitiesInjectable from "./catalog-sources/sync-general-catalog-entities.injectable";
@@ -248,10 +249,12 @@ app.on("ready", async () => {
     logger.info("🔌 Starting LensProxy");
     await lensProxy.listen(); // lensProxy.port available
   } catch (error) {
-    dialog.showErrorBox("Lens Error", `Could not start proxy: ${error?.message || "unknown error"}`);
+    dialog.showErrorBox("Lens Error", `Could not start proxy: ${error ? String(error) : "unknown error"}`);
 
     return app.exit();
   }
+
+  assert(lensProxy.port, "Lens Proxy failed to start");
 
   // test proxy connection
   try {
@@ -349,7 +352,7 @@ app.on("ready", async () => {
 
     extensionLoader.initExtensions(extensions);
   } catch (error) {
-    dialog.showErrorBox("Lens Error", `Could not load extensions${error?.message ? `: ${error.message}` : ""}`);
+    dialog.showErrorBox("Lens Error", `Could not load extensions${error ? `: ${String(error)}` : ""}`);
     console.error(error);
     console.trace();
   }

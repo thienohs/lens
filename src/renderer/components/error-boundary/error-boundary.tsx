@@ -28,7 +28,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, State> {
   }
 
   back = () => {
-    this.setState({ error: null, errorInfo: null });
+    this.setState({ error: undefined, errorInfo: undefined });
     navigation.goBack();
   };
 
@@ -36,8 +36,12 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, State> {
     const { error, errorInfo } = this.state;
 
     if (error) {
-      const slackLink = <a href={slackUrl} rel="noreferrer" target="_blank">Slack</a>;
-      const githubLink = <a href={issuesTrackerUrl} rel="noreferrer" target="_blank">Github</a>;
+      const slackLink = <a href={slackUrl}
+        rel="noreferrer"
+        target="_blank">Slack</a>;
+      const githubLink = <a href={issuesTrackerUrl}
+        rel="noreferrer"
+        target="_blank">Github</a>;
       const pageUrl = location.pathname;
 
       return (
@@ -51,7 +55,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, State> {
           <div className="wrapper">
             <code className="block">
               <p className="contrast">Component stack:</p>
-              {errorInfo.componentStack}
+              {errorInfo?.componentStack}
             </code>
             <code className="block">
               <p className="contrast">Error stack:</p>
@@ -60,7 +64,8 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, State> {
           </div>
           <Button
             className="box self-flex-start"
-            primary label="Back"
+            primary
+            label="Back"
             onClick={this.back}
           />
         </div>

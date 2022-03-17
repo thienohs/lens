@@ -32,7 +32,7 @@ export interface HotbarSelectorProps extends Partial<Dependencies> {
 
 const NonInjectedHotbarSelector = observer(({ hotbar, hotbarStore, openCommandOverlay }: HotbarSelectorProps & Dependencies) => {
   const [tooltipVisible, setTooltipVisible] = useState(false);
-  const tooltipTimeout = useRef<NodeJS.Timeout>();
+  const tooltipTimeout = useRef<number>();
 
   function clearTimer() {
     clearTimeout(tooltipTimeout.current);
@@ -41,7 +41,7 @@ const NonInjectedHotbarSelector = observer(({ hotbar, hotbarStore, openCommandOv
   function onTooltipShow() {
     setTooltipVisible(true);
     clearTimer();
-    tooltipTimeout.current = setTimeout(() => setTooltipVisible(false), 1500);
+    tooltipTimeout.current = window.setTimeout(() => setTooltipVisible(false), 1500);
   }
 
   function onArrowClick(switchTo: () => void) {
@@ -79,7 +79,11 @@ const NonInjectedHotbarSelector = observer(({ hotbar, hotbarStore, openCommandOv
           {hotbar.name}
         </Tooltip>
       </div>
-      <Icon material="play_arrow" className={styles.Icon} onClick={() => onArrowClick(hotbarStore.switchToNext)} />
+      <Icon
+        material="play_arrow"
+        className={styles.Icon}
+        onClick={() => onArrowClick(hotbarStore.switchToNext)}
+      />
     </div>
   );
 });

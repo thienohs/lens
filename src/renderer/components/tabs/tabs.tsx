@@ -25,10 +25,10 @@ export interface TabsProps<D = any> extends TabsContextValue<D>, Omit<DOMAttribu
 }
 
 export class Tabs extends React.PureComponent<TabsProps> {
-  public elem: HTMLElement;
+  public elem?: HTMLDivElement;
 
   @boundMethod
-  protected bindRef(elem: HTMLElement) {
+  protected bindRef(elem: HTMLDivElement) {
     this.elem = elem;
   }
 

@@ -9,13 +9,14 @@ import { prevDefault } from "../../utils";
 import { Button } from "../button";
 import { Icon } from "../icon";
 import { observer } from "mobx-react";
-import { Input, InputValidator, InputValidators } from "../input";
+import { Input, InputValidators } from "../input";
 import { SubTitle } from "../layout/sub-title";
 import { TooltipPosition } from "../tooltip";
 import type { ExtensionInstallationStateStore } from "../../../extensions/extension-installation-state-store/extension-installation-state-store";
 import extensionInstallationStateStoreInjectable
   from "../../../extensions/extension-installation-state-store/extension-installation-state-store.injectable";
 import { withInjectables } from "@ogre-tools/injectable-react";
+import { inputValidator } from "../input/input_validators";
 
 export interface InstallProps {
   installPath: string;
@@ -35,12 +36,12 @@ const installInputValidators = [
   InputValidators.isExtensionNameInstall,
 ];
 
-const installInputValidator: InputValidator = {
+const installInputValidator = inputValidator({
   message: "Invalid URL, absolute path, or extension name",
-  validate: (value: string) => (
-    installInputValidators.some(({ validate }) => validate(value))
+  validate: (value: string, props) => (
+    installInputValidators.some(({ validate }) => validate(value, props))
   ),
-};
+});
 
 const NonInjectedInstall: React.FC<Dependencies & InstallProps> = ({
   installPath,

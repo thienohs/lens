@@ -4,11 +4,11 @@
  */
 
 import { catalogCategoryRegistry } from "../catalog/catalog-category-registry";
-import { CatalogEntity, CatalogEntityActionContext, CatalogEntityContextMenuContext, CatalogEntityMetadata, CatalogEntityStatus, CatalogCategory, CatalogCategorySpec } from "../catalog";
+import { CatalogEntity, CatalogEntityActionContext, CatalogEntityContextMenuContext, CatalogEntityMetadata, CatalogEntityStatus, CatalogCategory, CatalogCategorySpec, categoryVersion } from "../catalog";
 import { ClusterStore } from "../cluster-store/cluster-store";
 import { broadcastMessage } from "../ipc";
 import { app } from "electron";
-import type { CatalogEntitySpec } from "../catalog/catalog-entity";
+import type { CatalogEntityConstructor, CatalogEntitySpec } from "../catalog/catalog-entity";
 import { IpcRendererNavigationEvents } from "../../renderer/navigation/events";
 import { requestClusterActivation, requestClusterDisconnection } from "../../renderer/ipc";
 import KubeClusterCategoryIcon from "./icons/kubernetes.svg";
@@ -57,6 +57,10 @@ export interface KubernetesClusterMetadata extends CatalogEntityMetadata {
 export type KubernetesClusterStatusPhase = "connected" | "connecting" | "disconnected" | "deleting";
 
 export interface KubernetesClusterStatus extends CatalogEntityStatus {
+}
+
+export function isKubernetesCluster(item: unknown): item is KubernetesCluster {
+  return item instanceof KubernetesCluster;
 }
 
 export class KubernetesCluster<
@@ -144,10 +148,7 @@ class KubernetesClusterCategory extends CatalogCategory {
   public spec: CatalogCategorySpec = {
     group: "entity.k8slens.dev",
     versions: [
-      {
-        name: "v1alpha1",
-        entityClass: KubernetesCluster,
-      },
+      categoryVersion("v1alpha1", KubernetesCluster as CatalogEntityConstructor<KubernetesCluster>),
     ],
     names: {
       kind: "KubernetesCluster",

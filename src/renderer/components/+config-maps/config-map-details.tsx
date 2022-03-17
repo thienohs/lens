@@ -12,7 +12,7 @@ import { DrawerTitle } from "../drawer";
 import { Notifications } from "../notifications";
 import { Input } from "../input";
 import { Button } from "../button";
-import { configMapsStore } from "./config-maps.store";
+import { configMapStore } from "./config-maps.store";
 import type { KubeObjectDetailsProps } from "../kube-object-details";
 import { ConfigMap } from "../../../common/k8s-api/endpoints";
 import { KubeObjectMeta } from "../kube-object-meta";
@@ -24,7 +24,7 @@ export interface ConfigMapDetailsProps extends KubeObjectDetailsProps<ConfigMap>
 @observer
 export class ConfigMapDetails extends React.Component<ConfigMapDetailsProps> {
   @observable isSaving = false;
-  @observable data = observable.map<string, string>();
+  @observable data = observable.map<string, string | undefined>();
 
   constructor(props: ConfigMapDetailsProps) {
     super(props);
@@ -48,7 +48,7 @@ export class ConfigMapDetails extends React.Component<ConfigMapDetailsProps> {
 
     try {
       this.isSaving = true;
-      await configMapsStore.update(configMap, {
+      await configMapStore.update(configMap, {
         ...configMap,
         data: Object.fromEntries(this.data),
       });
@@ -104,7 +104,8 @@ export class ConfigMapDetails extends React.Component<ConfigMapDetailsProps> {
               }
               <Button
                 primary
-                label="Save" waiting={this.isSaving}
+                label="Save"
+                waiting={this.isSaving}
                 className="save-btn"
                 onClick={this.save}
               />

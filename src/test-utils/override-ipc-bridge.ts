@@ -38,7 +38,7 @@ export const overrideIpcBridge = ({
         });
       }
 
-      return fakeChannelMap.get(key).resolve(callback);
+      return fakeChannelMap.get(key)?.resolve(callback);
     },
 
     get: <TChannel extends Channel<TInstance>, TInstance>(key: TChannel) => {
@@ -51,7 +51,7 @@ export const overrideIpcBridge = ({
         });
       }
 
-      return fakeChannelMap.get(key).promise;
+      return fakeChannelMap.get(key)?.promise;
     },
   };
 

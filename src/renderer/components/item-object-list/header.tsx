@@ -7,18 +7,18 @@ import "./item-list-layout.scss";
 
 import React, { ReactNode } from "react";
 import { observer } from "mobx-react";
-import { cssNames, IClassName } from "../../utils";
-import type { ItemObject, ItemStore } from "../../../common/item.store";
+import { cssNames, IClassName, isDefined } from "../../utils";
+import type { ItemObject } from "../../../common/item.store";
 import type { Filter } from "./page-filters.store";
-import type { HeaderCustomizer, HeaderPlaceholders, SearchFilter } from "./list-layout";
+import type { HeaderCustomizer, HeaderPlaceholders, ItemListStore, SearchFilter } from "./list-layout";
 import { SearchInputUrl } from "../input";
 
-export interface ItemListLayoutHeaderProps<I extends ItemObject> {
+export interface ItemListLayoutHeaderProps<I extends ItemObject, PreLoadStores extends boolean> {
   getItems: () => I[];
   getFilters: () => Filter[];
   toggleFilters: () => void;
 
-  store: ItemStore<I>;
+  store: ItemListStore<I, PreLoadStores>;
   searchFilters?: SearchFilter<I>[];
 
   // header (title, filtering, searching, etc.)
@@ -26,21 +26,19 @@ export interface ItemListLayoutHeaderProps<I extends ItemObject> {
   headerClassName?: IClassName;
   renderHeaderTitle?:
     | ReactNode
-    | ((parent: ItemListLayoutHeader<I>) => ReactNode);
+    | ((parent: ItemListLayoutHeader<I, PreLoadStores>) => ReactNode);
   customizeHeader?: HeaderCustomizer | HeaderCustomizer[];
 }
 
 @observer
-export class ItemListLayoutHeader<I extends ItemObject> extends React.Component<
-  ItemListLayoutHeaderProps<I>
-> {
+export class ItemListLayoutHeader<I extends ItemObject, PreLoadStores extends boolean> extends React.Component<ItemListLayoutHeaderProps<I, PreLoadStores>> {
   render() {
     const {
       showHeader,
       customizeHeader,
       renderHeaderTitle,
       headerClassName,
-      searchFilters,
+      searchFilters = [],
       getItems,
       store,
       getFilters,
@@ -68,7 +66,7 @@ export class ItemListLayoutHeader<I extends ItemObject> extends React.Component<
         : `${allItemsCount} items`;
     };
 
-    const customizeHeaderFunctions = [customizeHeader].flat().filter(Boolean);
+    const customizeHeaderFunctions = [customizeHeader].flat().filter(isDefined);
     const renderedTitle = typeof renderHeaderTitle === "function"
       ? renderHeaderTitle(this)
       : renderHeaderTitle;

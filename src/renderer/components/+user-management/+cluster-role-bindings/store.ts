@@ -4,19 +4,13 @@
  */
 
 import { apiManager } from "../../../../common/k8s-api/api-manager";
-import { ClusterRoleBinding, clusterRoleBindingApi, ClusterRoleBindingSubject } from "../../../../common/k8s-api/endpoints";
+import { ClusterRoleBinding, ClusterRoleBindingApi, clusterRoleBindingApi, ClusterRoleBindingData } from "../../../../common/k8s-api/endpoints";
+import type { Subject } from "../../../../common/k8s-api/endpoints/types/subject";
 import { KubeObjectStore } from "../../../../common/k8s-api/kube-object.store";
-import { autoBind, HashSet } from "../../../utils";
-import { hashClusterRoleBindingSubject } from "./hashers";
+import { HashSet, isClusterPageContext } from "../../../utils";
+import { hashSubject } from "../hashers";
 
-export class ClusterRoleBindingsStore extends KubeObjectStore<ClusterRoleBinding> {
-  api = clusterRoleBindingApi;
-
-  constructor() {
-    super();
-    autoBind(this);
-  }
-
+export class ClusterRoleBindingStore extends KubeObjectStore<ClusterRoleBinding, ClusterRoleBindingApi, ClusterRoleBindingData> {
   protected sortItems(items: ClusterRoleBinding[]) {
     return super.sortItems(items, [
       clusterRoleBinding => clusterRoleBinding.kind,
@@ -24,15 +18,15 @@ export class ClusterRoleBindingsStore extends KubeObjectStore<ClusterRoleBinding
     ]);
   }
 
-  async updateSubjects(clusterRoleBinding: ClusterRoleBinding, subjects: ClusterRoleBindingSubject[]) {
+  async updateSubjects(clusterRoleBinding: ClusterRoleBinding, subjects: Subject[]) {
     return this.update(clusterRoleBinding, {
       roleRef: clusterRoleBinding.roleRef,
       subjects,
     });
   }
 
-  async removeSubjects(clusterRoleBinding: ClusterRoleBinding, subjectsToRemove: Iterable<ClusterRoleBindingSubject>) {
-    const currentSubjects = new HashSet(clusterRoleBinding.getSubjects(), hashClusterRoleBindingSubject);
+  async removeSubjects(clusterRoleBinding: ClusterRoleBinding, subjectsToRemove: Iterable<Subject>) {
+    const currentSubjects = new HashSet(clusterRoleBinding.getSubjects(), hashSubject);
 
     for (const subject of subjectsToRemove) {
       currentSubjects.delete(subject);
@@ -42,6 +36,11 @@ export class ClusterRoleBindingsStore extends KubeObjectStore<ClusterRoleBinding
   }
 }
 
-export const clusterRoleBindingsStore = new ClusterRoleBindingsStore();
+export const clusterRoleBindingStore = isClusterPageContext()
+  ? new ClusterRoleBindingStore(clusterRoleBindingApi)
+  : undefined as never;
 
-apiManager.registerStore(clusterRoleBindingsStore);
+if (isClusterPageContext()) {
+  apiManager.registerStore(clusterRoleBindingStore);
+}
+

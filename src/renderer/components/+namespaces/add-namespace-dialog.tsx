@@ -23,7 +23,7 @@ import type { NamespaceStore } from "./namespace-store/namespace.store";
 
 export interface AddNamespaceDialogProps extends DialogProps {
   onSuccess?(ns: Namespace): void;
-  onError?(error: any): void;
+  onError?(error: unknown): void;
 }
 
 interface Dependencies {
@@ -54,7 +54,7 @@ class NonInjectedAddNamespaceDialog extends React.Component<AddNamespaceDialogPr
       onSuccess?.(created);
       this.props.model.close();
     } catch (err) {
-      Notifications.error(err);
+      Notifications.checkedError(err, "Unknown error occured while creating the namespace");
       onError?.(err);
     }
   };
@@ -79,12 +79,14 @@ class NonInjectedAddNamespaceDialog extends React.Component<AddNamespaceDialogPr
             next={this.addNamespace}
           >
             <Input
-              required autoFocus
+              required
+              autoFocus
               iconLeft="layers"
               placeholder="Namespace"
               trim
               validators={systemName}
-              value={namespace} onChange={v => this.namespace = v.toLowerCase()}
+              value={namespace}
+              onChange={v => this.namespace = v.toLowerCase()}
             />
           </WizardStep>
         </Wizard>

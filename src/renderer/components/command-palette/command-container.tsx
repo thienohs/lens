@@ -44,7 +44,8 @@ class NonInjectedCommandContainer extends React.Component<Dependencies> {
     const clusterIsActive = this.props.matchedClusterId.get() !== undefined;
 
     if (clusterIsActive) {
-      broadcastMessage(`command-palette:${catalogEntityRegistry.activeEntity.getId()}:open`);
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      broadcastMessage(`command-palette:${catalogEntityRegistry.activeEntity!.getId()}:open`);
     } else {
       commandOverlay.open(<CommandDialog />);
     }
