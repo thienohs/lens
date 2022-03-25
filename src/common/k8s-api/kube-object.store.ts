@@ -64,6 +64,24 @@ export abstract class KubeObjectStore<T extends KubeObject> extends ItemStore<T>
   public readonly bufferSize: number = 50000;
   @observable private loadedNamespaces?: string[];
 
+  /**
+   * The field is used for configuring whether the edit button is displayed by default from
+   * {@link KubeObjectMenu} for detail views of instances of `T`.
+   *
+   * This should only be set once, in the constructor of base classes since the views will
+   * not be reactive to any changes to this value.
+   */
+  public readonly showEditButton = true;
+
+  /**
+   * The field is used for configuring whether the remove button is displayed by default from
+   * {@link KubeObjectMenu} for detail views of instances of `T`.
+   *
+   * This should only be set once, in the constructor of base classes since the views will
+   * not be reactive to any changes to this value.
+   */
+  public readonly showRemoveButton = true;
+
   get contextReady() {
     return when(() => Boolean(this.context));
   }

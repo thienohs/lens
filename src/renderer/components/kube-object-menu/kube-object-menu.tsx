@@ -41,11 +41,11 @@ class NonInjectedKubeObjectMenu<TKubeObject extends KubeObject> extends React.Co
   }
 
   get isEditable() {
-    return this.props.editable ?? Boolean(this.store?.patch);
+    return this.props.editable ?? this.store?.showEditButton ?? false;
   }
 
   get isRemovable() {
-    return this.props.removable ?? Boolean(this.store?.remove);
+    return this.props.removable ?? this.store?.showRemoveButton ?? false;
   }
 
   @boundMethod
