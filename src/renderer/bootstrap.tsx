@@ -41,8 +41,8 @@ import navigateToAddClusterInjectable  from "../common/front-end-routing/routes/
 import addSyncEntriesInjectable from "./initializers/add-sync-entries.injectable";
 import hotbarStoreInjectable from "../common/hotbar-store.injectable";
 import { bindEvents } from "./navigation/events";
-import deleteClusterDialogModelInjectable
-  from "./components/delete-cluster-dialog/delete-cluster-dialog-model/delete-cluster-dialog-model.injectable";
+import deleteClusterDialogModelInjectable from "./components/delete-cluster-dialog/delete-cluster-dialog-model/delete-cluster-dialog-model.injectable";
+import { runSetups } from "../common/setupable-injection-token/run-setups";
 
 if (process.isMainFrame) {
   SentryInit();
@@ -63,7 +63,7 @@ async function attachChromeDebugger() {
 }
 
 export async function bootstrap(di: DiContainer) {
-  await di.runSetups();
+  await runSetups(di);
 
   // TODO: Consolidate import time side-effect to setup time
   bindEvents();
