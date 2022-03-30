@@ -3,7 +3,7 @@
  * Licensed under MIT License. See LICENSE in root directory for more information.
  */
 
-import net from "net";
+import type net from "net";
 import type http from "http";
 import spdy from "spdy";
 import type httpProxy from "http-proxy";
@@ -11,7 +11,6 @@ import { apiPrefix, apiKubePrefix } from "../common/vars";
 import type { Router } from "./router/router";
 import type { ContextHandler } from "./context-handler/context-handler";
 import logger from "./logger";
-import { Singleton } from "../common/utils";
 import type { Cluster } from "../common/cluster/cluster";
 import type { ProxyApiRequestArgs } from "./proxy-functions";
 import { appEventBus } from "../common/app-event-bus/event-bus";
@@ -19,10 +18,12 @@ import { getBoolean } from "./utils/parse-query";
 
 type GetClusterForRequest = (req: http.IncomingMessage) => Cluster | null;
 
-export interface LensProxyFunctions {
+interface Dependencies {
   getClusterForRequest: GetClusterForRequest;
   shellApiRequest: (args: ProxyApiRequestArgs) => void | Promise<void>;
   kubeApiUpgradeRequest: (args: ProxyApiRequestArgs) => void | Promise<void>;
+  router: Router;
+  proxy: httpProxy;
 }
 
 const watchParam = "watch";
@@ -52,21 +53,16 @@ const disallowedPorts = new Set([
   10080,
 ]);
 
-export class LensProxy extends Singleton {
+export class LensProxy {
   protected origin: string;
   protected proxyServer: http.Server;
   protected closed = false;
   protected retryCounters = new Map<string, number>();
-  protected getClusterForRequest: GetClusterForRequest;
 
   public port: number;
 
-  constructor(protected router: Router, protected proxy: httpProxy, { shellApiRequest, kubeApiUpgradeRequest, getClusterForRequest }: LensProxyFunctions) {
-    super();
-
-    this.configureProxy(proxy);
-
-    this.getClusterForRequest = getClusterForRequest;
+  constructor(private dependencies: Dependencies) {
+    this.configureProxy(dependencies.proxy);
 
     this.proxyServer = spdy.createServer({
       spdy: {
@@ -79,14 +75,14 @@ export class LensProxy extends Singleton {
 
     this.proxyServer
       .on("upgrade", (req: http.IncomingMessage, socket: net.Socket, head: Buffer) => {
-        const cluster = getClusterForRequest(req);
+        const cluster = dependencies.getClusterForRequest(req);
 
         if (!cluster) {
           logger.error(`[LENS-PROXY]: Could not find cluster for upgrade request from url=${req.url}`);
           socket.destroy();
         } else {
           const isInternal = req.url.startsWith(`${apiPrefix}?`);
-          const reqHandler = isInternal ? shellApiRequest : kubeApiUpgradeRequest;
+          const reqHandler = isInternal ? dependencies.shellApiRequest : dependencies.kubeApiUpgradeRequest;
 
           (async () => reqHandler({ req, socket, head, cluster }))()
             .catch(error => logger.error("[LENS-PROXY]: failed to handle proxy upgrade", error));
@@ -237,15 +233,15 @@ export class LensProxy extends Singleton {
   }
 
   protected async handleRequest(req: http.IncomingMessage, res: http.ServerResponse) {
-    const cluster = this.getClusterForRequest(req);
+    const cluster = this.dependencies.getClusterForRequest(req);
 
     if (cluster) {
       const proxyTarget = await this.getProxyTarget(req, cluster.contextHandler);
 
       if (proxyTarget) {
-        return this.proxy.web(req, res, proxyTarget);
+        return this.dependencies.proxy.web(req, res, proxyTarget);
       }
     }
-    this.router.route(cluster, req, res);
+    this.dependencies.router.route(cluster, req, res);
   }
 }

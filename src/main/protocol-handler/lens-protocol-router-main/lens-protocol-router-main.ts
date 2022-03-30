@@ -11,7 +11,7 @@ import { broadcastMessage } from "../../../common/ipc";
 import { observable, when, makeObservable } from "mobx";
 import { ProtocolHandlerInvalid, RouteAttempt } from "../../../common/protocol-handler";
 import { disposer, noop } from "../../../common/utils";
-import { WindowManager } from "../../window-manager";
+import type { WindowManager } from "../../window-manager";
 import type { ExtensionLoader } from "../../../extensions/extension-loader";
 import type { ExtensionsStore } from "../../../extensions/extensions-store/extensions-store";
 
@@ -39,6 +39,7 @@ function checkHost<Query>(url: URLParse<Query>): boolean {
 interface Dependencies {
   extensionLoader: ExtensionLoader;
   extensionsStore: ExtensionsStore;
+  windowManager: WindowManager;
 }
 
 export class LensProtocolRouterMain extends proto.LensProtocolRouter {
@@ -72,7 +73,7 @@ export class LensProtocolRouterMain extends proto.LensProtocolRouter {
         throw new proto.RoutingError(proto.RoutingErrorType.INVALID_PROTOCOL, url);
       }
 
-      WindowManager.getInstance(false)?.ensureMainWindow().catch(noop);
+      this.dependencies.windowManager.ensureMainWindow().catch(noop);
       const routeInternally = checkHost(url);
 
       logger.info(`${proto.LensProtocolRouter.LoggingPrefix}: routing ${url.toString()}`);

@@ -11,6 +11,8 @@ import createContextHandlerInjectable from "../context-handler/create-context-ha
 import { createClusterInjectionToken } from "../../common/cluster/create-cluster-injection-token";
 import authorizationReviewInjectable from "../../common/cluster/authorization-review.injectable";
 import listNamespacesInjectable from "../../common/cluster/list-namespaces.injectable";
+import detectorRegistryInjectable from "../cluster-detectors/detector-registry.injectable";
+import createVersionDetectorInjectable from "../cluster-detectors/create-version-detector.injectable";
 
 const createClusterInjectable = getInjectable({
   id: "create-cluster",
@@ -23,6 +25,8 @@ const createClusterInjectable = getInjectable({
       createContextHandler: di.inject(createContextHandlerInjectable),
       createAuthorizationReview: di.inject(authorizationReviewInjectable),
       createListNamespaces: di.inject(listNamespacesInjectable),
+      detectorRegistry: di.inject(detectorRegistryInjectable),
+      createVersionDetector: di.inject(createVersionDetectorInjectable),
     };
 
     return (model) => new Cluster(dependencies, model);

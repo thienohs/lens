@@ -13,8 +13,8 @@ import type { KubeconfigManager } from "../../main/kubeconfig-manager/kubeconfig
 import { loadConfigFromFile, loadConfigFromFileSync, validateKubeConfig } from "../kube-helpers";
 import { apiResourceRecord, apiResources, KubeApiResource, KubeResource } from "../rbac";
 import logger from "../../main/logger";
-import { VersionDetector } from "../../main/cluster-detectors/version-detector";
-import { DetectorRegistry } from "../../main/cluster-detectors/detector-registry";
+import type { VersionDetector } from "../../main/cluster-detectors/version-detector";
+import type { DetectorRegistry } from "../../main/cluster-detectors/detector-registry";
 import plimit from "p-limit";
 import type { ClusterState, ClusterRefreshOptions, ClusterMetricsResourceType, ClusterId, ClusterMetadata, ClusterModel, ClusterPreferences, ClusterPrometheusPreferences, UpdateClusterModel, KubeAuthUpdate } from "../cluster-types";
 import { ClusterMetadataKey, initialNodeShellImage, ClusterStatus } from "../cluster-types";
@@ -31,6 +31,8 @@ export interface ClusterDependencies {
   createKubectl: (clusterVersion: string) => Kubectl;
   createAuthorizationReview: (config: KubeConfig) => CanI;
   createListNamespaces: (config: KubeConfig) => ListNamespaces;
+  detectorRegistry: DetectorRegistry;
+  createVersionDetector: (cluster: Cluster) => VersionDetector;
 }
 
 /**
@@ -423,7 +425,7 @@ export class Cluster implements ClusterModel, ClusterState {
   @action
   async refreshMetadata() {
     logger.info(`[CLUSTER]: refreshMetadata`, this.getMeta());
-    const metadata = await DetectorRegistry.getInstance().detectForCluster(this);
+    const metadata = await this.dependencies.detectorRegistry.detectForCluster(this);
     const existingMetadata = this.metadata;
 
     this.metadata = Object.assign(existingMetadata, metadata);
@@ -486,7 +488,7 @@ export class Cluster implements ClusterModel, ClusterState {
 
   protected async getConnectionStatus(): Promise<ClusterStatus> {
     try {
-      const versionDetector = new VersionDetector(this);
+      const versionDetector = this.dependencies.createVersionDetector(this);
       const versionData = await versionDetector.detect();
 
       this.metadata.version = versionData.value;

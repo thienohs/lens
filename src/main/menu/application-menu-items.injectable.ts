@@ -5,7 +5,6 @@
 import { getInjectable } from "@ogre-tools/injectable";
 import { checkForUpdates } from "../app-updater";
 import { docsUrl, productName, supportUrl } from "../../common/vars";
-import { exitApp } from "../exit-app";
 import { broadcastMessage } from "../../common/ipc";
 import { openBrowser } from "../../common/utils";
 import { showAbout } from "./menu";
@@ -25,6 +24,7 @@ import navigateToExtensionsInjectable from "../../common/front-end-routing/route
 import navigateToCatalogInjectable from "../../common/front-end-routing/routes/catalog/navigate-to-catalog.injectable";
 import navigateToWelcomeInjectable from "../../common/front-end-routing/routes/welcome/navigate-to-welcome.injectable";
 import navigateToAddClusterInjectable from "../../common/front-end-routing/routes/add-cluster/navigate-to-add-cluster.injectable";
+import stopServicesAndExitAppInjectable from "../stop-services-and-exit-app.injectable";
 import isMacInjectable from "../../common/vars/is-mac.injectable";
 import { computed } from "mobx";
 
@@ -51,6 +51,7 @@ const applicationMenuItemsInjectable = getInjectable({
       // TODO: These injects should happen outside of the computed.
       // TODO: Remove temporal dependencies in WindowManager to make sure timing is correct.
       const windowManager = di.inject(windowManagerInjectable);
+      const stopServicesAndExitApp = di.inject(stopServicesAndExitAppInjectable);
       const navigateToPreferences = di.inject(navigateToPreferencesInjectable);
       const navigateToExtensions = di.inject(navigateToExtensionsInjectable);
       const navigateToCatalog = di.inject(navigateToCatalogInjectable);
@@ -109,7 +110,7 @@ const applicationMenuItemsInjectable = getInjectable({
             accelerator: "Cmd+Q",
             id: "quit",
             click() {
-              exitApp();
+              stopServicesAndExitApp();
             },
           },
         ],
@@ -163,7 +164,7 @@ const applicationMenuItemsInjectable = getInjectable({
               accelerator: "Alt+F4",
               id: "quit",
               click() {
-                exitApp();
+                stopServicesAndExitApp();
               },
             },
           ]),

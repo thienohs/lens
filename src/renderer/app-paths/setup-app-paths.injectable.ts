@@ -5,8 +5,10 @@
 import { getInjectable } from "@ogre-tools/injectable";
 import { AppPaths, appPathsIpcChannel } from "../../common/app-paths/app-path-injection-token";
 import getValueFromRegisteredChannelInjectable from "./get-value-from-registered-channel/get-value-from-registered-channel.injectable";
-import { setupableInjectionToken } from "../../common/setupable-injection-token/setupable-injection-token";
 import appPathsStateInjectable from "../../common/app-paths/app-paths-state.injectable";
+import {
+  onApplicationIsReadyInjectionToken,
+} from "../../main/start-main-application/start-main-application.injectable";
 
 let syncAppPaths: AppPaths;
 
@@ -14,7 +16,7 @@ const setupAppPathsInjectable = getInjectable({
   id: "setup-app-paths",
 
   instantiate: (di) => ({
-    runSetup: async () => {
+    run: async () => {
       const getValueFromRegisteredChannel = di.inject(
         getValueFromRegisteredChannelInjectable,
       );
@@ -27,7 +29,7 @@ const setupAppPathsInjectable = getInjectable({
     },
   }),
 
-  injectionToken: setupableInjectionToken,
+  injectionToken: onApplicationIsReadyInjectionToken,
 });
 
 export default setupAppPathsInjectable;

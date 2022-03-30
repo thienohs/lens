@@ -14,7 +14,7 @@ import { ClusterFrameInfo, clusterFrameMap } from "../common/cluster-frames";
 import { IpcRendererNavigationEvents } from "../renderer/navigation/events";
 import logger from "./logger";
 import { isMac, productName } from "../common/vars";
-import { LensProxy } from "./lens-proxy";
+import type { LensProxy } from "./lens-proxy";
 import { bundledExtensionsLoaded } from "../common/ipc/extension-handling";
 
 function isHideable(window: BrowserWindow | null): boolean {
@@ -27,9 +27,11 @@ export interface SendToViewArgs {
   data?: any[];
 }
 
-export class WindowManager extends Singleton {
-  public mainContentUrl = `http://localhost:${LensProxy.getInstance().port}`;
+interface Dependencies {
+  lensProxy: LensProxy;
+}
 
+export class WindowManager extends Singleton {
   protected mainWindow: BrowserWindow;
   protected splashWindow: BrowserWindow;
   protected windowState: windowStateKeeper.State;
@@ -37,10 +39,14 @@ export class WindowManager extends Singleton {
 
   @observable activeClusterId: ClusterId;
 
-  constructor() {
+  constructor(private dependencies: Dependencies) {
     super();
     makeObservable(this);
     this.bindEvents();
+  }
+
+  get mainContentUrl() {
+    return `http://localhost:${this.dependencies.lensProxy.port}`;
   }
 
   private async initMainWindow(showSplash: boolean) {

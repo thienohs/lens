@@ -12,7 +12,6 @@ import { checkForUpdates, isAutoUpdateEnabled } from "../app-updater";
 import type { WindowManager } from "../window-manager";
 import logger from "../logger";
 import { isDevelopment, isWindows, productName } from "../../common/vars";
-import { exitApp } from "../exit-app";
 import { toJS } from "../../common/utils";
 import type { TrayMenuRegistration } from "./tray-menu-registration";
 
@@ -34,6 +33,7 @@ export function initTray(
   windowManager: WindowManager,
   trayMenuItems: IComputedValue<TrayMenuRegistration[]>,
   navigateToPreferences: () => void,
+  stopServicesAndExitApp: () => void,
 ) {
   const icon = getTrayIcon();
 
@@ -52,7 +52,7 @@ export function initTray(
   const disposers = [
     autorun(() => {
       try {
-        const menu = createTrayMenu(windowManager, toJS(trayMenuItems.get()), navigateToPreferences);
+        const menu = createTrayMenu(windowManager, toJS(trayMenuItems.get()), navigateToPreferences, stopServicesAndExitApp);
 
         tray.setContextMenu(menu);
       } catch (error) {
@@ -82,6 +82,7 @@ function createTrayMenu(
   windowManager: WindowManager,
   extensionTrayItems: TrayMenuRegistration[],
   navigateToPreferences: () => void,
+  stopServicesAndExitApp: () => void,
 ): Menu {
   let template: Electron.MenuItemConstructorOptions[] = [
     {
@@ -125,7 +126,7 @@ function createTrayMenu(
     {
       label: "Quit App",
       click() {
-        exitApp();
+        stopServicesAndExitApp();
       },
     },
   ]));
