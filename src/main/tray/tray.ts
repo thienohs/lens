@@ -12,7 +12,7 @@ import type { WindowManager } from "../window-manager";
 import logger from "../logger";
 import { isWindows, productName } from "../../common/vars";
 import { exitApp } from "../exit-app";
-import { base64, getOrInsertWithAsync, toJS } from "../../common/utils";
+import { base64, Disposer, disposer, getOrInsertWithAsync, toJS } from "../../common/utils";
 import type { TrayMenuRegistration } from "./tray-menu-registration";
 import sharp from "sharp";
 import LogoLens from "../../renderer/components/icon/logo-lens.svg";
@@ -50,7 +50,7 @@ async function createTrayIcon({ shouldUseDarkColors, size, sourceSvg }: CreateTr
   });
 }
 
-function computeCurrentTrayIcon() {
+function createCurrentTrayIcon() {
   return createTrayIcon({
     shouldUseDarkColors: nativeTheme.shouldUseDarkColors,
     size: 16,
@@ -58,29 +58,34 @@ function computeCurrentTrayIcon() {
   });
 }
 
-function watchShouldUseDarkColors(tray: Tray) {
+function watchShouldUseDarkColors(tray: Tray): Disposer {
   let prevShouldUseDarkColors = nativeTheme.shouldUseDarkColors;
-
-  nativeTheme.on("updated", () => {
+  const onUpdated = () => {
     if (prevShouldUseDarkColors !== nativeTheme.shouldUseDarkColors) {
       prevShouldUseDarkColors = nativeTheme.shouldUseDarkColors;
-      computeCurrentTrayIcon()
+      createCurrentTrayIcon()
         .then(img => tray.setImage(img));
     }
-  });
+  };
+
+  nativeTheme.on("updated", onUpdated);
+
+  return () => nativeTheme.off("updated", onUpdated);
 }
 
 export async function initTray(
   windowManager: WindowManager,
   trayMenuItems: IComputedValue<TrayMenuRegistration[]>,
   navigateToPreferences: () => void,
-) {
-  const icon = await computeCurrentTrayIcon();
+): Promise<Disposer> {
+  const icon = await createCurrentTrayIcon();
+  const dispose = disposer();
 
   tray = new Tray(icon);
   tray.setToolTip(packageInfo.description);
   tray.setIgnoreDoubleClickEvents(true);
-  watchShouldUseDarkColors(tray);
+
+  dispose.push(watchShouldUseDarkColors(tray));
 
   if (isWindows) {
     tray.on("click", () => {
@@ -90,7 +95,7 @@ export async function initTray(
     });
   }
 
-  const disposers = [
+  dispose.push(
     autorun(() => {
       try {
         const menu = createTrayMenu(windowManager, toJS(trayMenuItems.get()), navigateToPreferences);
@@ -100,13 +105,13 @@ export async function initTray(
         logger.error(`${TRAY_LOG_PREFIX}: building failed`, { error });
       }
     }),
-  ];
+    () => {
+      tray?.destroy();
+      tray = null;
+    },
+  );
 
-  return () => {
-    disposers.forEach(disposer => disposer());
-    tray?.destroy();
-    tray = null;
-  };
+  return dispose;
 }
 
 function getMenuItemConstructorOptions(trayItem: TrayMenuRegistration): Electron.MenuItemConstructorOptions {
