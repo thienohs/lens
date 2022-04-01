@@ -62,7 +62,7 @@ describe("<HotbarRemoveCommand />", () => {
     UserStore.resetInstance();
   });
 
-  it("renders w/o errors", async () => {
+  it("renders w/o errors", () => {
     di.override(hotbarStoreInjectable, () => ({
       hotbars: [mockHotbars["1"]],
       getById: (id: string) => mockHotbars[id],
@@ -72,14 +72,12 @@ describe("<HotbarRemoveCommand />", () => {
       getDisplayLabel: () => "1: Default",
     }) as any as HotbarStore);
 
-    await di.runSetups();
-
     const { container } = render(<HotbarRemoveCommand />);
 
     expect(container).toBeInstanceOf(HTMLElement);
   });
 
-  it("calls remove if you click on the entry", async () => {
+  it("calls remove if you click on the entry", () => {
     const removeMock = jest.fn();
 
     di.override(hotbarStoreInjectable, () => ({
@@ -89,8 +87,6 @@ describe("<HotbarRemoveCommand />", () => {
       hotbarIndex: () => 0,
       getDisplayLabel: () => "1: Default",
     }) as any as HotbarStore);
-
-    await di.runSetups();
 
     const { getByText } = render(
       <>
