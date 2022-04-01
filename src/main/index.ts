@@ -62,6 +62,7 @@ import hotbarStoreInjectable from "../common/hotbar-store.injectable";
 import applicationMenuItemsInjectable from "./menu/application-menu-items.injectable";
 import type { DiContainer } from "@ogre-tools/injectable";
 import { init } from "@sentry/electron/main";
+import { EntityPreferencesStore } from "../common/entity-preferences-store";
 
 async function main(di: DiContainer) {
   app.setName(appName);
@@ -316,7 +317,10 @@ async function main(di: DiContainer) {
   }
 
   ipcMainOn(IpcRendererNavigationEvents.LOADED, async () => {
-    onCloseCleanup.push(pushCatalogToRenderer(catalogEntityRegistry));
+    onCloseCleanup.push(pushCatalogToRenderer({
+      catalogEntityRegistry,
+      entityPreferencesStore: EntityPreferencesStore.createInstance(),
+    }));
 
     const directoryForKubeConfigs = di.inject(directoryForKubeConfigsInjectable);
 

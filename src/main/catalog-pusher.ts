@@ -10,29 +10,37 @@ import "../common/catalog-entities/kubernetes-cluster";
 import { disposer, toJS } from "../common/utils";
 import { debounce } from "lodash";
 import type { CatalogEntity, CatalogEntityData, CatalogEntityKindData } from "../common/catalog";
-import { EntityPreferencesStore } from "../common/entity-preferences-store";
+import type { EntityPreferencesStore } from "../common/entity-preferences-store";
 import { catalogInitChannel, catalogItemsChannel } from "../common/ipc/catalog";
 
-function changesDueToPreferences({ metadata, spec, status, kind, apiVersion }: CatalogEntity): CatalogEntityData & CatalogEntityKindData {
-  const preferences = EntityPreferencesStore.getInstance().preferences.get(metadata.uid) ?? {};
+const changesDueToPreferencesWith = (entityPreferencesStore: EntityPreferencesStore) => (
+  ({ metadata, spec, status, kind, apiVersion }: CatalogEntity): CatalogEntityData & CatalogEntityKindData => {
+    const preferences = entityPreferencesStore.preferences.get(metadata.uid) ?? {};
 
-  if (preferences.shortName) {
-    metadata.shortName ||= preferences.shortName;
+    if (preferences.shortName) {
+      metadata.shortName = preferences.shortName;
+    }
+
+    return { metadata, spec, status, kind, apiVersion };
   }
-
-  return { metadata, spec, status, kind, apiVersion };
-}
+);
 
 const broadcaster = debounce((items: (CatalogEntityData & CatalogEntityKindData)[]) => {
+  console.log(items.length);
   broadcastMessage(catalogItemsChannel, items);
 }, 100, { leading: true, trailing: true });
 
-export function pushCatalogToRenderer(catalog: CatalogEntityRegistry) {
-  const entityData = computed(() => toJS(catalog.items.map(changesDueToPreferences)));
+export interface Dependencies {
+  catalogEntityRegistry: CatalogEntityRegistry;
+  entityPreferencesStore: EntityPreferencesStore;
+}
+
+export function pushCatalogToRenderer({ catalogEntityRegistry, entityPreferencesStore }: Dependencies) {
+  const entityData = computed(() => toJS(catalogEntityRegistry.items.map(changesDueToPreferencesWith(entityPreferencesStore))));
 
   return disposer(
-    ipcMainOn(catalogInitChannel, () => broadcaster(toJS(catalog.items))),
-    reaction(() => toJS(entityData.get()), broadcaster, {
+    ipcMainOn(catalogInitChannel, () => broadcaster(entityData.get())),
+    reaction(() => entityData.get(), broadcaster, {
       fireImmediately: true,
     }),
   );
