@@ -6,7 +6,7 @@
 import fs from "fs";
 import mockFs from "mock-fs";
 import path from "path";
-import fse from "fs-extra";
+import fse, { readFileSync } from "fs-extra";
 import type { Cluster } from "../cluster/cluster";
 import { ClusterStore } from "../cluster-store/cluster-store";
 import { Console } from "console";
@@ -24,6 +24,7 @@ import directoryForUserDataInjectable from "../app-paths/directory-for-user-data
 import { getDiForUnitTesting } from "../../main/getDiForUnitTesting";
 import getConfigurationFileModelInjectable from "../get-configuration-file-model/get-configuration-file-model.injectable";
 import appVersionInjectable from "../get-configuration-file-model/app-version/app-version.injectable";
+import readFileSyncInjectable from "../fs/read-file-sync.injectable";
 
 console = new Console(stdout, stderr);
 
@@ -86,6 +87,7 @@ describe("cluster-store", () => {
 
     mainDi.override(clusterStoreInjectable, (di) => ClusterStore.createInstance({ createCluster: di.inject(createClusterInjectionToken) }));
     mainDi.override(directoryForUserDataInjectable, () => "some-directory-for-user-data");
+    mainDi.override(readFileSyncInjectable, () => readFileSync); // TODO: don't bypass injectables
 
     mainDi.permitSideEffects(getConfigurationFileModelInjectable);
     mainDi.permitSideEffects(appVersionInjectable);
