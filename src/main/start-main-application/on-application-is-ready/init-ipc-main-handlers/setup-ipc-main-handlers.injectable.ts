@@ -21,7 +21,6 @@ const setupIpcMainHandlersInjectable = getInjectable({
       directoryForLensLocalStorageInjectable,
     );
 
-
     const clusterManager = di.inject(clusterManagerInjectable);
     const applicationMenuItems = di.inject(applicationMenuItemsInjectable);
     const getAbsolutePath = di.inject(getAbsolutePathInjectable);

@@ -10,11 +10,10 @@ import path from "path";
 import fs from "fs-extra";
 import { dumpConfigYaml } from "../../common/kube-helpers";
 import logger from "../logger";
-import type { LensProxy } from "../lens-proxy";
 
 interface Dependencies {
   directoryForTemp: string;
-  lensProxy: LensProxy;
+  lensProxyPortNumberState: { get: () => number };
 }
 
 export class KubeconfigManager {
@@ -80,7 +79,7 @@ export class KubeconfigManager {
   }
 
   get resolveProxyUrl() {
-    return `http://127.0.0.1:${this.dependencies.lensProxy.port}/${this.cluster.id}`;
+    return `http://127.0.0.1:${this.dependencies.lensProxyPortNumberState.get()}/${this.cluster.id}`;
   }
 
   /**
