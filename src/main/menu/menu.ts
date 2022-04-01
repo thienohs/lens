@@ -3,20 +3,11 @@
  * Licensed under MIT License. See LICENSE in root directory for more information.
  */
 import { app, BrowserWindow, dialog, Menu } from "electron";
-import { autorun, IComputedValue } from "mobx";
 import { appName, isWindows, productName } from "../../common/vars";
 import packageJson from "../../../package.json";
 import type { MenuItemOpts } from "./application-menu-items.injectable";
 
 export type MenuTopId = "mac" | "file" | "edit" | "view" | "help";
-
-export function initMenu(
-  applicationMenuItems: IComputedValue<MenuItemOpts[]>,
-) {
-  return autorun(() => buildMenu(applicationMenuItems.get()), {
-    delay: 100,
-  });
-}
 
 export function showAbout(browserWindow: BrowserWindow) {
   const appInfo = [

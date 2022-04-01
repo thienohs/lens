@@ -9,32 +9,21 @@ import * as Mobx from "mobx";
 import * as LensExtensionsCommonApi from "../extensions/common-api";
 import * as LensExtensionsMainApi from "../extensions/main-api";
 import { app, autoUpdater, dialog } from "electron";
-import { isIntegrationTesting, isMac } from "../common/vars";
+import { isIntegrationTesting } from "../common/vars";
 import logger from "./logger";
 import { appEventBus } from "../common/app-event-bus/event-bus";
 import type { InstalledExtension } from "../extensions/extension-discovery/extension-discovery";
 import type { LensExtensionId } from "../extensions/lens-extension";
-import { installDeveloperTools } from "./developer-tools";
 import { ipcMainOn } from "../common/ipc";
 import { startUpdateChecking } from "./app-updater";
 import { IpcRendererNavigationEvents } from "../renderer/navigation/events";
 import { startCatalogSyncToRenderer } from "./catalog-pusher";
 import { catalogEntityRegistry } from "./catalog";
 import { ensureDir } from "fs-extra";
-import { initMenu } from "./menu/menu";
-import { initTray } from "./tray/tray";
-import { ShellSession } from "./shell-session/shell-session";
 import { getDi } from "./getDi";
-import extensionLoaderInjectable from "../extensions/extension-loader/extension-loader.injectable";
-import extensionDiscoveryInjectable from "../extensions/extension-discovery/extension-discovery.injectable";
 import directoryForKubeConfigsInjectable from "../common/app-paths/directory-for-kube-configs/directory-for-kube-configs.injectable";
 import kubeconfigSyncManagerInjectable from "./catalog-sources/kubeconfig-sync-manager/kubeconfig-sync-manager.injectable";
-import trayMenuItemsInjectable from "./tray/tray-menu-items.injectable";
-import windowManagerInjectable from "./window-manager.injectable";
-import navigateToPreferencesInjectable from "../common/front-end-routing/routes/preferences/navigate-to-preferences.injectable";
 import startMainApplicationInjectable from "./start-main-application/start-main-application.injectable";
-import stopServicesAndExitAppInjectable from "./stop-services-and-exit-app.injectable";
-import applicationMenuItemsInjectable from "./menu/application-menu-items.injectable";
 
 const di = getDi();
 
@@ -83,38 +72,6 @@ app.on("ready", async () => {
    * if this is not present
    */
   // syncGeneralCatalogEntities();
-
-  const extensionLoader = di.inject(extensionLoaderInjectable);
-
-  extensionLoader.init();
-
-  const extensionDiscovery = di.inject(extensionDiscoveryInjectable);
-
-  extensionDiscovery.init();
-
-  // Start the app without showing the main window when auto starting on login
-  // (On Windows and Linux, we get a flag. On MacOS, we get special API.)
-  const startHidden = process.argv.includes("--hidden") || (isMac && app.getLoginItemSettings().wasOpenedAsHidden);
-
-  logger.info("🖥️  Starting WindowManager");
-  const windowManager = di.inject(windowManagerInjectable);
-
-  const applicationMenuItems = di.inject(applicationMenuItemsInjectable);
-  const trayMenuItems = di.inject(trayMenuItemsInjectable);
-  const navigateToPreferences = di.inject(navigateToPreferencesInjectable);
-  const stopServicesAndExitApp = di.inject(stopServicesAndExitAppInjectable);
-
-  onQuitCleanup.push(
-    initMenu(applicationMenuItems),
-    initTray(windowManager, trayMenuItems, navigateToPreferences, stopServicesAndExitApp),
-    () => ShellSession.cleanup(),
-  );
-
-  installDeveloperTools();
-
-  if (!startHidden) {
-    windowManager.ensureMainWindow();
-  }
 
   ipcMainOn(IpcRendererNavigationEvents.LOADED, async () => {
     onCloseCleanup.push(startCatalogSyncToRenderer(catalogEntityRegistry));
