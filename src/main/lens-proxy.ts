@@ -3,7 +3,7 @@
  * Licensed under MIT License. See LICENSE in root directory for more information.
  */
 
-import type net from "net";
+import net from "net";
 import type http from "http";
 import spdy from "spdy";
 import type httpProxy from "http-proxy";

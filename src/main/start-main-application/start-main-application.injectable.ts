@@ -102,11 +102,11 @@ export const onOpenOfUrlInjectionToken = getInjectionToken<
   id: "on-open-of-url",
 });
 
-interface Runnable<TParameter = void> {
+export interface Runnable<TParameter = void> {
   run: (parameter: TParameter) => Promise<void> | void;
 }
 
-const runManyFor =
+export const runManyFor =
   (di: DiContainerForInjection) =>
   <TRunnable extends Runnable<unknown>>(
       injectionToken: InjectionToken<TRunnable, void>,

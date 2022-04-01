@@ -8,21 +8,11 @@
 import * as Mobx from "mobx";
 import * as LensExtensionsCommonApi from "../extensions/common-api";
 import * as LensExtensionsMainApi from "../extensions/main-api";
-import { app, autoUpdater, dialog } from "electron";
+import { app, autoUpdater } from "electron";
 import { isIntegrationTesting } from "../common/vars";
 import logger from "./logger";
 import { appEventBus } from "../common/app-event-bus/event-bus";
-import type { InstalledExtension } from "../extensions/extension-discovery/extension-discovery";
-import type { LensExtensionId } from "../extensions/lens-extension";
-import { ipcMainOn } from "../common/ipc";
-import { startUpdateChecking } from "./app-updater";
-import { IpcRendererNavigationEvents } from "../renderer/navigation/events";
-import { startCatalogSyncToRenderer } from "./catalog-pusher";
-import { catalogEntityRegistry } from "./catalog";
-import { ensureDir } from "fs-extra";
 import { getDi } from "./getDi";
-import directoryForKubeConfigsInjectable from "../common/app-paths/directory-for-kube-configs/directory-for-kube-configs.injectable";
-import kubeconfigSyncManagerInjectable from "./catalog-sources/kubeconfig-sync-manager/kubeconfig-sync-manager.injectable";
 import startMainApplicationInjectable from "./start-main-application/start-main-application.injectable";
 
 const di = getDi();
@@ -72,46 +62,6 @@ app.on("ready", async () => {
    * if this is not present
    */
   // syncGeneralCatalogEntities();
-
-  ipcMainOn(IpcRendererNavigationEvents.LOADED, async () => {
-    onCloseCleanup.push(startCatalogSyncToRenderer(catalogEntityRegistry));
-
-    const directoryForKubeConfigs = di.inject(directoryForKubeConfigsInjectable);
-
-    await ensureDir(directoryForKubeConfigs);
-
-    const kubeConfigSyncManager = di.inject(kubeconfigSyncManagerInjectable);
-
-    kubeConfigSyncManager.startSync();
-
-    startUpdateChecking();
-    lensProtocolRouterMain.rendererLoaded = true;
-  });
-
-  logger.info("🧩 Initializing extensions");
-
-  // call after windowManager to see splash earlier
-  try {
-    const extensions = await extensionDiscovery.load();
-
-    // Start watching after bundled extensions are loaded
-    extensionDiscovery.watchExtensions();
-
-    // Subscribe to extensions that are copied or deleted to/from the extensions folder
-    extensionDiscovery.events
-      .on("add", (extension: InstalledExtension) => {
-        extensionLoader.addExtension(extension);
-      })
-      .on("remove", (lensExtensionId: LensExtensionId) => {
-        extensionLoader.removeExtension(lensExtensionId);
-      });
-
-    extensionLoader.initExtensions(extensions);
-  } catch (error) {
-    dialog.showErrorBox("Lens Error", `Could not load extensions${error?.message ? `: ${error.message}` : ""}`);
-    console.error(error);
-    console.trace();
-  }
 
   setTimeout(() => {
     appEventBus.emit({ name: "service", action: "start" });
