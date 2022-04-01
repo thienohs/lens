@@ -12,9 +12,8 @@ import type { WindowManager } from "../window-manager";
 import logger from "../logger";
 import { isWindows, productName } from "../../common/vars";
 import { exitApp } from "../exit-app";
-import { getOrInsertWithAsync, toJS } from "../../common/utils";
+import { base64, getOrInsertWithAsync, toJS } from "../../common/utils";
 import type { TrayMenuRegistration } from "./tray-menu-registration";
-import parseDataURL from "data-urls";
 import sharp from "sharp";
 import LogoLens from "../../renderer/components/icon/logo-lens.svg";
 import { JSDOM } from "jsdom";
@@ -25,7 +24,7 @@ const TRAY_LOG_PREFIX = "[TRAY]";
 // note: instance of Tray should be saved somewhere, otherwise it disappears
 export let tray: Tray;
 
-interface ComputeTrayIconArgs {
+interface CreateTrayIconArgs {
   shouldUseDarkColors: boolean;
   size: number;
   sourceSvg: string;
@@ -33,12 +32,11 @@ interface ComputeTrayIconArgs {
 
 const trayIcons = new Map<boolean, NativeImage>();
 
-async function computeTrayIcon({ shouldUseDarkColors, size, sourceSvg }: ComputeTrayIconArgs): Promise<NativeImage> {
+async function createTrayIcon({ shouldUseDarkColors, size, sourceSvg }: CreateTrayIconArgs): Promise<NativeImage> {
   return getOrInsertWithAsync(trayIcons, shouldUseDarkColors, async () => {
     const trayIconColor = shouldUseDarkColors ? "white" : "black"; // Invert to show contrast
-    const parsedSvg = parseDataURL(sourceSvg);
-    const svgContent = Buffer.from(parsedSvg.body.buffer).toString();
-    const svgDom = new JSDOM(`<body>${svgContent}</body>`);
+    const parsedSvg = base64.decode(sourceSvg.split("base64,")[1]);
+    const svgDom = new JSDOM(`<body>${parsedSvg}</body>`);
     const svgRoot = svgDom.window.document.body.getElementsByTagName("svg")[0];
 
     svgRoot.innerHTML += `<style>* {fill: ${trayIconColor} !important;}</style>`;
@@ -53,7 +51,7 @@ async function computeTrayIcon({ shouldUseDarkColors, size, sourceSvg }: Compute
 }
 
 function computeCurrentTrayIcon() {
-  return computeTrayIcon({
+  return createTrayIcon({
     shouldUseDarkColors: nativeTheme.shouldUseDarkColors,
     size: 16,
     sourceSvg: LogoLens,
