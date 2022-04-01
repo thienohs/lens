@@ -93,8 +93,8 @@ export class Wizard<D> extends React.Component<WizardProps<D>, State> {
       <div className={cssNames("Wizard", className)}>
         <div className="header">
           {header}
-          {title ? <SubTitle title={title}/> : null}
-          {!hideSteps && steps.length > 1 ? <Stepper steps={steps} step={this.step}/> : null}
+          {title ? <SubTitle title={title} /> : null}
+          {!hideSteps && steps.length > 1 ? <Stepper steps={steps} step={this.step} /> : null}
         </div>
         {step}
       </div>
@@ -188,7 +188,7 @@ export class WizardStep<D> extends React.Component<WizardStepProps<D>, WizardSte
   renderLoading() {
     return (
       <div className="step-loading flex center">
-        <Spinner/>
+        <Spinner />
       </div>
     );
   }

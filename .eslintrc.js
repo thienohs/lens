@@ -145,10 +145,22 @@ module.exports = {
             "multi": 1,
           },
         }],
+        "react/jsx-first-prop-new-line": ["error", "multiline"],
+        "react/jsx-wrap-multilines": ["error", {
+          "declaration": "parens-new-line",
+          "assignment": "parens-new-line",
+          "return": "parens-new-line",
+          "arrow": "parens-new-line",
+          "condition": "parens-new-line",
+          "logical": "parens-new-line",
+          "prop": "parens-new-line",
+        }],
         "react/jsx-one-expression-per-line": ["error", {
           "allow": "single-child",
         }],
-        "react/jsx-tag-spacing": ["error"],
+        "react/jsx-tag-spacing": ["error", {
+          "beforeSelfClosing": "multiline-always",
+        }],
         "react/display-name": "off",
         "space-before-function-paren": "off",
         "@typescript-eslint/space-before-function-paren": ["error", {

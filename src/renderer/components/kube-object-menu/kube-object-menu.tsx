@@ -76,7 +76,11 @@ class NonInjectedKubeObjectMenu<TKubeObject extends KubeObject> extends React.Co
 
     return (
       <p>
-        Remove {object.kind} <b>{breadcrumb}</b> from <b>{this.props.clusterName}</b>?
+        {`Remove ${object.kind} `}
+        <b>{breadcrumb}</b>
+        {" from "}
+        <b>{this.props.clusterName}</b>
+        ?
       </p>
     );
   }
@@ -87,11 +91,8 @@ class NonInjectedKubeObjectMenu<TKubeObject extends KubeObject> extends React.Co
     }
 
     return this.props.kubeObjectMenuItems.map((MenuItem, index) => (
-      <MenuItem
-        object={object}
-        toolbar={toolbar}
-        key={`menu-item-${index}`}
-      />
+      <MenuItem object={object} toolbar={toolbar}
+        key={`menu-item-${index}`} />
     ));
   }
 
