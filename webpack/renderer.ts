@@ -161,11 +161,9 @@ export interface CssModulesWebpackRuleOptions {
  * Import CSS or SASS styles with modules support (*.module.scss)
  */
 export function cssModulesWebpackRule({ styleLoader }: CssModulesWebpackRuleOptions = {}): webpack.RuleSetRule {
-  styleLoader ??= (
-    isDevelopment
-      ? "style-loader"
-      : MiniCssExtractPlugin.loader
-  );
+  styleLoader ??= isDevelopment
+    ? "style-loader"
+    : MiniCssExtractPlugin.loader;
 
   return {
     test: /\.s?css$/,
