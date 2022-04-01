@@ -19,7 +19,7 @@ const startMainWindowInjectable = getInjectable({
     const isMac = di.inject(isMacInjectable);
 
     return {
-      run: () => {
+      run: async () => {
         // Start the app without showing the main window when auto starting on login
         // (On Windows and Linux, we get a flag. On MacOS, we get special API.)
         const startHidden =
@@ -29,7 +29,7 @@ const startMainWindowInjectable = getInjectable({
         logger.info("🖥️  Starting WindowManager");
 
         if (!startHidden) {
-          windowManager.ensureMainWindow();
+          await windowManager.ensureMainWindow();
         }
       },
     };
