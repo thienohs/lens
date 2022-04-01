@@ -5,9 +5,9 @@
 import { getInjectable } from "@ogre-tools/injectable";
 import exitAppInjectable from "./app-paths/get-electron-app-path/electron-app/exit-app.injectable";
 import clusterManagerInjectable from "./cluster-manager.injectable";
-import { appEventBus } from "../common/app-event-bus/event-bus";
-import logger from "./logger";
 import windowManagerInjectable from "./window-manager.injectable";
+import appEventBusInjectable from "../common/app-event-bus/app-event-bus.injectable";
+import loggerInjectable from "../common/logger.injectable";
 
 const stopServicesAndExitAppInjectable = getInjectable({
   id: "stop-services-and-exit-app",
@@ -16,6 +16,8 @@ const stopServicesAndExitAppInjectable = getInjectable({
     const exitApp = di.inject(exitAppInjectable);
     const windowManager = di.inject(windowManagerInjectable);
     const clusterManager = di.inject(clusterManagerInjectable);
+    const appEventBus = di.inject(appEventBusInjectable);
+    const logger = di.inject(loggerInjectable);
 
     return () => {
       appEventBus.emit({ name: "service", action: "close" });
@@ -25,8 +27,6 @@ const stopServicesAndExitAppInjectable = getInjectable({
       setTimeout(exitApp, 1000);
     };
   },
-
-  causesSideEffects: true,
 });
 
 export default stopServicesAndExitAppInjectable;

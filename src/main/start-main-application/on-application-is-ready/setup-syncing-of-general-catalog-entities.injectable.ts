@@ -4,22 +4,19 @@
  */
 import { getInjectable } from "@ogre-tools/injectable";
 import { onApplicationIsReadyInjectionToken } from "../start-main-application.injectable";
-import generalCatalogEntitiesInjectable from "../../../common/catalog-entities/general-catalog-entities/general-catalog-entities.injectable";
-import catalogEntityRegistryInjectable from "../../catalog/catalog-entity-registry.injectable";
+import syncGeneralCatalogEntitiesInjectable from "../../catalog-sources/sync-general-catalog-entities.injectable";
 
 const setupSyncingOfGeneralCatalogEntitiesInjectable = getInjectable({
   id: "setup-syncing-of-general-catalog-entities",
 
   instantiate: (di) => {
-    const generalCatalogEntities = di.inject(generalCatalogEntitiesInjectable);
-    const catalogEntityRegistry = di.inject(catalogEntityRegistryInjectable);
+    const syncGeneralCatalogEntities = di.inject(
+      syncGeneralCatalogEntitiesInjectable,
+    );
 
     return {
       run: () => {
-        catalogEntityRegistry.addObservableSource(
-          "lens:general",
-          generalCatalogEntities,
-        );
+        syncGeneralCatalogEntities();
       },
     };
   },
