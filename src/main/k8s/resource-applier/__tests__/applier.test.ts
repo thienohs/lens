@@ -17,7 +17,7 @@ import type { Unlink } from "../../../../common/fs/unlink.injectable";
 import unlinkInjectable from "../../../../common/fs/unlink.injectable";
 import type { WriteFile } from "../../../../common/fs/write-file.injectable";
 import writeFileInjectable from "../../../../common/fs/write-file.injectable";
-import baseLoggerInjectable from "../../../../common/logger/logger.injectable";
+import loggerInjectable from "../../../../common/logger.injectable";
 import { expectInSetOnce } from "../../../../test-utils/expects";
 import type { ExecFile } from "../../../child-process/exec-file.injectable";
 import execFileInjectable from "../../../child-process/exec-file.injectable";
@@ -79,7 +79,7 @@ describe("ResourceApplier", () => {
         }],
       });
     }));
-    di.override(baseLoggerInjectable, () => ({
+    di.override(loggerInjectable, () => ({
       debug: jest.fn(),
       info: jest.fn(),
       error: jest.fn(),

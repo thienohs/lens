@@ -9,7 +9,7 @@ import tempDirInjectable from "../../../common/fs/temp-dir.injectable";
 import tempFileInjectable from "../../../common/fs/temp-file.injectable";
 import unlinkInjectable from "../../../common/fs/unlink.injectable";
 import writeFileInjectable from "../../../common/fs/write-file.injectable";
-import baseLoggerInjectable from "../../../common/logger/logger.injectable";
+import loggerInjectable from "../../../common/logger.injectable";
 import execFileInjectable from "../../child-process/exec-file.injectable";
 import { K8sResourceApplier, ResourceApplier, ResourceApplierDependencies } from "./applier";
 
@@ -23,7 +23,7 @@ const createK8sResourceApplierInjectable = getInjectable({
       removeDir: di.inject(removeDirInjectable),
       unlink: di.inject(unlinkInjectable),
       writeFile: di.inject(writeFileInjectable),
-      logger: di.inject(baseLoggerInjectable),
+      logger: di.inject(loggerInjectable),
       tempDir: di.inject(tempDirInjectable),
       tempFile: di.inject(tempFileInjectable),
     };

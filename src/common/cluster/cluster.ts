@@ -22,7 +22,7 @@ import { clusterListNamespaceForbiddenChannel } from "../ipc/cluster";
 import type { CanI } from "./authorization-review.injectable";
 import type { ListNamespaces } from "./list-namespaces.injectable";
 import type { ReadFileSync } from "../fs/read-file-sync.injectable";
-import type { LensLogger } from "../logger";
+import type { Logger } from "../logger";
 
 export interface ClusterDependencies {
   readonly directoryForKubeConfigs: string;
@@ -33,7 +33,7 @@ export interface ClusterDependencies {
   createListNamespaces: (config: KubeConfig) => ListNamespaces;
   readFileSync: ReadFileSync;
   readonly setupCluster: boolean;
-  readonly logger: LensLogger;
+  readonly logger: Logger;
 }
 
 /**
