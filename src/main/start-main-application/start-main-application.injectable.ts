@@ -41,17 +41,6 @@ const startMainApplicationInjectable = getInjectable({
     const runManyForOpenOfUrl = runMany(onOpenOfUrlInjectionToken);
 
     return async () => {
-      await runManyBeforeApplicationIsReady();
-
-      app.on("ready", async () => {
-        await runManyAfterApplicationIsReady();
-
-        // TODO: Figure out place for this
-        setTimeout(() => {
-          appEventBus.emit({ name: "service", action: "start" });
-        }, 1000);
-      });
-
       app.on("second-instance", async (_, commandLineArguments) => {
         await runManyForSecondApplicationInstance({ commandLineArguments });
       });
@@ -67,6 +56,17 @@ const startMainApplicationInjectable = getInjectable({
       app.on("open-url", async (event, url) => {
         await runManyForOpenOfUrl({ event, url });
       });
+
+      await runManyBeforeApplicationIsReady();
+
+      await app.whenReady();
+
+      await runManyAfterApplicationIsReady();
+
+      // TODO: Figure out place for this
+      setTimeout(() => {
+        appEventBus.emit({ name: "service", action: "start" });
+      }, 1000);
     };
   },
 });

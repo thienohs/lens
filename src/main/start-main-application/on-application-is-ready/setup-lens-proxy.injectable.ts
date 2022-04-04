@@ -13,6 +13,7 @@ import lensProxyInjectable from "../../lens-proxy.injectable";
 import loggerInjectable from "../../../common/logger.injectable";
 import { dialog } from "electron";
 import lensProxyPortNumberStateInjectable from "../../lens-proxy-port-number-state.injectable";
+import isWindowsInjectable from "../../../common/vars/is-windows.injectable";
 
 const setupLensProxyInjectable = getInjectable({
   id: "setup-lens-proxy",
@@ -22,6 +23,7 @@ const setupLensProxyInjectable = getInjectable({
     const exitApp = di.inject(exitAppInjectable);
     const logger = di.inject(loggerInjectable);
     const lensProxyPortNumberState = di.inject(lensProxyPortNumberStateInjectable);
+    const isWindows = di.inject(isWindowsInjectable);
 
     return {
       run: async () => {
@@ -51,19 +53,19 @@ const setupLensProxyInjectable = getInjectable({
         } catch (error) {
           logger.error(`🛑 LensProxy: failed connection test: ${error}`);
 
-          // const hostsPath = isWindows
-          //   ? "C:\\windows\\system32\\drivers\\etc\\hosts"
-          //   : "/etc/hosts";
-          // const message = [
-          //   `Failed connection test: ${error}`,
-          //   "Check to make sure that no other versions of Lens are running",
-          //   `Check ${hostsPath} to make sure that it is clean and that the localhost loopback is at the top and set to 127.0.0.1`,
-          //   "If you have HTTP_PROXY or http_proxy set in your environment, make sure that the localhost and the ipv4 loopback address 127.0.0.1 are added to the NO_PROXY environment variable.",
-          // ];
+          const hostsPath = isWindows
+            ? "C:\\windows\\system32\\drivers\\etc\\hosts"
+            : "/etc/hosts";
+          const message = [
+            `Failed connection test: ${error}`,
+            "Check to make sure that no other versions of Lens are running",
+            `Check ${hostsPath} to make sure that it is clean and that the localhost loopback is at the top and set to 127.0.0.1`,
+            "If you have HTTP_PROXY or http_proxy set in your environment, make sure that the localhost and the ipv4 loopback address 127.0.0.1 are added to the NO_PROXY environment variable.",
+          ];
 
-          // dialog.showErrorBox("Lens Proxy Error", message.join("\n\n"));
+          dialog.showErrorBox("Lens Proxy Error", message.join("\n\n"));
 
-          // return exitApp();
+          return exitApp();
         }
       },
     };

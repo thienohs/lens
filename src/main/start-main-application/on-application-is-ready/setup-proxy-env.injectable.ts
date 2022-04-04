@@ -5,7 +5,7 @@
 import { getInjectable } from "@ogre-tools/injectable";
 import { mangleProxyEnv } from "../../proxy-env";
 import {
-  onApplicationIsReadyInjectionToken,
+  beforeApplicationIsReadyInjectionToken,
 } from "../start-main-application.injectable";
 
 const setupProxyEnvInjectable = getInjectable({
@@ -17,7 +17,7 @@ const setupProxyEnvInjectable = getInjectable({
     },
   }),
 
-  injectionToken: onApplicationIsReadyInjectionToken,
+  injectionToken: beforeApplicationIsReadyInjectionToken,
 });
 
 export default setupProxyEnvInjectable;
