@@ -6,8 +6,8 @@ import { getInjectable } from "@ogre-tools/injectable";
 import applicationMenuInitializerInjectable from "./application-menu-initializer.injectable";
 import { onApplicationQuitInjectionToken } from "../start-main-application/on-application-close/implementations/quit-application/on-application-quit/on-application-quit-injection-token";
 
-const cleanupApplicationMenuInjectable = getInjectable({
-  id: "cleanup-application-menu",
+const cleanupApplicationMenuWhenApplicationIsQuitInjectable = getInjectable({
+  id: "cleanup-application-menu-when-application-is-quit",
 
   instantiate: (di) => {
     const initializeApplicationMenu = di.inject(
@@ -24,4 +24,4 @@ const cleanupApplicationMenuInjectable = getInjectable({
   injectionToken: onApplicationQuitInjectionToken,
 });
 
-export default cleanupApplicationMenuInjectable;
+export default cleanupApplicationMenuWhenApplicationIsQuitInjectable;
