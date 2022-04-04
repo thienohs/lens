@@ -2,7 +2,7 @@
  * Copyright (c) OpenLens Authors. All rights reserved.
  * Licensed under MIT License. See LICENSE in root directory for more information.
  */
-import { app, BrowserWindow, dialog, Menu } from "electron";
+import { app, BrowserWindow, clipboard, dialog, Menu } from "electron";
 import { autorun, IComputedValue } from "mobx";
 import { appName, isWindows, productName } from "../../common/vars";
 import packageJson from "../../../package.json";
@@ -18,22 +18,28 @@ export function initMenu(
   });
 }
 
-export function showAbout(browserWindow: BrowserWindow) {
+export async function showAbout(browserWindow: BrowserWindow) {
   const appInfo = [
     `${appName}: ${app.getVersion()}`,
     `Electron: ${process.versions.electron}`,
     `Chrome: ${process.versions.chrome}`,
     `Node: ${process.versions.node}`,
     packageJson.copyright,
-  ];
+  ].join("\n");
 
-  dialog.showMessageBoxSync(browserWindow, {
+  const result = await dialog.showMessageBox(browserWindow, {
     title: `${isWindows ? " ".repeat(2) : ""}${appName}`,
     type: "info",
-    buttons: ["Close"],
+    buttons: ["Close", "Copy"],
     message: productName,
-    detail: appInfo.join("\r\n"),
+    detail: appInfo,
+    cancelId: 0,
+    defaultId: 0,
   });
+
+  if (result.response === 0) {
+    clipboard.writeText(appInfo);
+  }
 }
 
 export function buildMenu(
