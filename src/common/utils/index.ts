@@ -23,7 +23,6 @@ export * from "./debouncePromise";
 export * from "./defineGlobal";
 export * from "./delay";
 export * from "./disposer";
-export * from "./downloadFile";
 export * from "./escapeRegExp";
 export * from "./formatDuration";
 export * from "./getRandId";

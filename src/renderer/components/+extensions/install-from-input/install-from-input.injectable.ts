@@ -6,8 +6,8 @@ import { getInjectable } from "@ogre-tools/injectable";
 import attemptInstallInjectable from "../attempt-install/attempt-install.injectable";
 import { installFromInput } from "./install-from-input";
 import attemptInstallByInfoInjectable from "../attempt-install-by-info/attempt-install-by-info.injectable";
-import extensionInstallationStateStoreInjectable
-  from "../../../../extensions/extension-installation-state-store/extension-installation-state-store.injectable";
+import extensionInstallationStateStoreInjectable from "../../../../extensions/extension-installation-state-store/extension-installation-state-store.injectable";
+import fetchInjectable from "../../../../common/fetch/fetch.injectable";
 
 const installFromInputInjectable = getInjectable({
   id: "install-from-input",
@@ -17,6 +17,7 @@ const installFromInputInjectable = getInjectable({
       attemptInstall: di.inject(attemptInstallInjectable),
       attemptInstallByInfo: di.inject(attemptInstallByInfoInjectable),
       extensionInstallationStateStore: di.inject(extensionInstallationStateStoreInjectable),
+      fetch: di.inject(fetchInjectable),
     }),
 });
 

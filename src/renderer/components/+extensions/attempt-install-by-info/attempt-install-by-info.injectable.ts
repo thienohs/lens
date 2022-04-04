@@ -6,8 +6,8 @@ import { getInjectable } from "@ogre-tools/injectable";
 import { attemptInstallByInfo } from "./attempt-install-by-info";
 import attemptInstallInjectable from "../attempt-install/attempt-install.injectable";
 import getBaseRegistryUrlInjectable from "../get-base-registry-url/get-base-registry-url.injectable";
-import extensionInstallationStateStoreInjectable
-  from "../../../../extensions/extension-installation-state-store/extension-installation-state-store.injectable";
+import extensionInstallationStateStoreInjectable from "../../../../extensions/extension-installation-state-store/extension-installation-state-store.injectable";
+import fetchInjectable from "../../../../common/fetch/fetch.injectable";
 
 const attemptInstallByInfoInjectable = getInjectable({
   id: "attempt-install-by-info",
@@ -17,6 +17,7 @@ const attemptInstallByInfoInjectable = getInjectable({
       attemptInstall: di.inject(attemptInstallInjectable),
       getBaseRegistryUrl: di.inject(getBaseRegistryUrlInjectable),
       extensionInstallationStateStore: di.inject(extensionInstallationStateStoreInjectable),
+      fetch: di.inject(fetchInjectable),
     }),
 });
 

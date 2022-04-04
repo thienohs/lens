@@ -20,36 +20,27 @@ import { DiRender, renderFor } from "../../test-utils/renderFor";
 import extensionDiscoveryInjectable from "../../../../extensions/extension-discovery/extension-discovery.injectable";
 import directoryForUserDataInjectable from "../../../../common/app-paths/directory-for-user-data/directory-for-user-data.injectable";
 import directoryForDownloadsInjectable from "../../../../common/app-paths/directory-for-downloads/directory-for-downloads.injectable";
-import getConfigurationFileModelInjectable
-  from "../../../../common/get-configuration-file-model/get-configuration-file-model.injectable";
-import appVersionInjectable
-  from "../../../../common/get-configuration-file-model/app-version/app-version.injectable";
+import getConfigurationFileModelInjectable from "../../../../common/get-configuration-file-model/get-configuration-file-model.injectable";
+import appVersionInjectable from "../../../../common/get-configuration-file-model/app-version/app-version.injectable";
+import fetchInjectable from "../../../../common/fetch/fetch.injectable";
+import fetchMock, { type FetchMockSandbox } from "fetch-mock";
+
+console.log("This is here as a reminder that mockFs breaks things and needs to be removed");
 
 mockWindow();
 
 jest.setTimeout(30000);
 jest.mock("fs-extra");
 jest.mock("../../notifications");
-
-jest.mock("../../../../common/utils/downloadFile", () => ({
-  downloadFile: jest.fn(({ url }) => ({
-    promise: Promise.resolve(),
-    url,
-    cancel: () => {},
-  })),
-  downloadJson: jest.fn(({ url }) => ({
-    promise: Promise.resolve({}),
-    url,
-    cancel: () => { },
-  })),
+jest.mock("../../../../common/utils/tar", () => ({
+  listTarEntries: () => [] as string[],
 }));
-
-jest.mock("../../../../common/utils/tar");
 
 describe("Extensions", () => {
   let extensionLoader: ExtensionLoader;
   let extensionDiscovery: ExtensionDiscovery;
   let render: DiRender;
+  let mockFetch: FetchMockSandbox;
 
   beforeEach(async () => {
     const di = getDiForUnitTesting({ doGeneralOverrides: true });
@@ -59,6 +50,9 @@ describe("Extensions", () => {
 
     di.permitSideEffects(getConfigurationFileModelInjectable);
     di.permitSideEffects(appVersionInjectable);
+
+    mockFetch = fetchMock.sandbox();
+    di.override(fetchInjectable, () => mockFetch as any);
 
     mockFs({
       "some-directory-for-user-data": {},
@@ -103,19 +97,19 @@ describe("Extensions", () => {
 
     fireEvent.click(menuTrigger);
 
-    expect(res.getByText("Disable")).toHaveAttribute("aria-disabled", "false");
-    expect(res.getByText("Uninstall")).toHaveAttribute("aria-disabled", "false");
+    expect(await res.findByText("Disable")).toHaveAttribute("aria-disabled", "false");
+    expect(await res.findByText("Uninstall")).toHaveAttribute("aria-disabled", "false");
 
-    fireEvent.click(res.getByText("Uninstall"));
+    fireEvent.click(await res.findByText("Uninstall"));
 
     // Approve confirm dialog
-    fireEvent.click(res.getByText("Yes"));
+    fireEvent.click(await res.findByText("Yes"));
 
-    await waitFor(() => {
+    await waitFor(async () => {
       expect(extensionDiscovery.uninstallExtension).toHaveBeenCalled();
       fireEvent.click(menuTrigger);
-      expect(res.getByText("Disable")).toHaveAttribute("aria-disabled", "true");
-      expect(res.getByText("Uninstall")).toHaveAttribute("aria-disabled", "true");
+      expect(await res.findByText("Disable")).toHaveAttribute("aria-disabled", "true");
+      expect(await res.findByText("Uninstall")).toHaveAttribute("aria-disabled", "true");
     }, {
       timeout: 30000,
     });
@@ -123,6 +117,7 @@ describe("Extensions", () => {
 
   it("disables install button while installing", async () => {
     const res = render(<Extensions />);
+    const url = "https://test.extensionurl/package.tgz";
 
     (fse.unlink as jest.MockedFunction<typeof fse.unlink>).mockReturnValue(Promise.resolve() as any);
 
@@ -130,12 +125,19 @@ describe("Extensions", () => {
       exact: false,
     }), {
       target: {
-        value: "https://test.extensionurl/package.tgz",
+        value: url,
       },
     });
 
-    fireEvent.click(res.getByText("Install"));
-    expect(res.getByText("Install").closest("button")).toBeDisabled();
+    let resolveBuffer: (buf: Buffer) => void;
+
+    mockFetch.getOnce(url, new Promise<Buffer>(resolve => {
+      resolveBuffer = resolve;
+    }));
+
+    fireEvent.click(await res.findByText("Install"));
+    expect((await res.findByText("Install")).closest("button")).toBeDisabled();
+    resolveBuffer(Buffer.from([]));
   });
 
   it("displays spinner while extensions are loading", () => {

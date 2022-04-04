@@ -2,7 +2,7 @@
  * Copyright (c) OpenLens Authors. All rights reserved.
  * Licensed under MIT License. See LICENSE in root directory for more information.
  */
-import { downloadFile, ExtendableDisposer } from "../../../../common/utils";
+import type { ExtendableDisposer } from "../../../../common/utils";
 import { InputValidators } from "../../input";
 import { getMessageFromError } from "../get-message-from-error/get-message-from-error";
 import logger from "../../../../main/logger";
@@ -13,14 +13,21 @@ import { readFileNotify } from "../read-file-notify/read-file-notify";
 import type { InstallRequest } from "../attempt-install/install-request";
 import type { ExtensionInfo } from "../attempt-install-by-info/attempt-install-by-info";
 import type { ExtensionInstallationStateStore } from "../../../../extensions/extension-installation-state-store/extension-installation-state-store";
+import type { Fetch } from "../../../../common/fetch/fetch.injectable";
 
 interface Dependencies {
   attemptInstall: (request: InstallRequest, disposer?: ExtendableDisposer) => Promise<void>;
   attemptInstallByInfo: (extensionInfo: ExtensionInfo) => Promise<void>;
   extensionInstallationStateStore: ExtensionInstallationStateStore;
+  fetch: Fetch;
 }
 
-export const installFromInput = ({ attemptInstall, attemptInstallByInfo, extensionInstallationStateStore }: Dependencies) => async (input: string) => {
+export const installFromInput = ({
+  attemptInstall,
+  attemptInstallByInfo,
+  extensionInstallationStateStore,
+  fetch,
+}: Dependencies) => async (input: string) => {
   let disposer: ExtendableDisposer | undefined = undefined;
 
   try {
@@ -28,10 +35,17 @@ export const installFromInput = ({ attemptInstall, attemptInstallByInfo, extensi
     if (InputValidators.isUrl.validate(input)) {
       // install via url
       disposer = extensionInstallationStateStore.startPreInstall();
-      const { promise } = downloadFile({ url: input, timeout: 10 * 60 * 1000 });
+      const request = await fetch(input, { timeout: 10 * 60 * 1000 });
+
+      if (request.status === 404) {
+        Notifications.error("Failed to install extension. Does not exist.");
+
+        return disposer();
+      }
+
       const fileName = path.basename(input);
 
-      await attemptInstall({ fileName, dataP: promise }, disposer);
+      await attemptInstall({ fileName, dataP: request.buffer() }, disposer);
     } else if (InputValidators.isPath.validate(input)) {
       // install from system path
       const fileName = path.basename(input);
