@@ -11,9 +11,11 @@ import { beforeApplicationIsReadyInjectionToken } from "./before-application-is-
 import { onApplicationIsReadyInjectionToken } from "./on-application-is-ready/on-application-is-ready-injection-token";
 import { onSecondApplicationInstanceInjectionToken } from "./on-second-application-instance/on-second-application-instance-injection-token";
 import { onApplicationActivationInjectionToken } from "./on-application-activation/on-application-activation-injection-token";
-import { onApplicationQuitInjectionToken } from "./on-application-quit/on-application-quit-injection-token";
 import { onOpenOfUrlInjectionToken } from "./on-open-of-url/on-open-of-url-injection-token";
 import { runManyFor } from "./run-many-for";
+import {
+  onApplicationCloseInjectionToken,
+} from "./on-application-close/on-application-close-injection-token";
 
 const startMainApplicationInjectable = getInjectable({
   id: "start-main-application",
@@ -38,7 +40,7 @@ const startMainApplicationInjectable = getInjectable({
       onApplicationActivationInjectionToken,
     );
 
-    const runManyForApplicationQuit = runMany(onApplicationQuitInjectionToken);
+    const runManyForApplicationClose = runMany(onApplicationCloseInjectionToken);
 
     const runManyForOpenOfUrl = runMany(onOpenOfUrlInjectionToken);
 
@@ -52,7 +54,7 @@ const startMainApplicationInjectable = getInjectable({
       });
 
       app.on("will-quit", async (event) => {
-        await runManyForApplicationQuit({ event });
+        await runManyForApplicationClose({ event });
       });
 
       app.on("open-url", async (event, url) => {

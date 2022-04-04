@@ -9,6 +9,9 @@ import windowManagerInjectable from "../../../window-manager.injectable";
 import stopServicesAndExitAppInjectable from "../../../stop-services-and-exit-app.injectable";
 import trayMenuItemsInjectable from "../../../tray/tray-menu-items.injectable";
 import navigateToPreferencesInjectable from "../../../../common/front-end-routing/routes/preferences/navigate-to-preferences.injectable";
+import {
+  onApplicationQuitInjectionToken,
+} from "../../on-application-close/implementations/quit-application/on-application-quit/on-application-quit-injection-token";
 
 const setupTrayInjectable = getInjectable({
   id: "setup-tray",
@@ -21,9 +24,22 @@ const setupTrayInjectable = getInjectable({
 
     return {
       run: () => {
+        const dispose = initTray(windowManager, trayMenuItems, navigateToPreferences, stopServicesAndExitApp);
 
-        // TODO: Dispose on application quit
-        initTray(windowManager, trayMenuItems, navigateToPreferences, stopServicesAndExitApp);
+        const disposeInjectable = getInjectable({
+          id: "dispose-tray",
+
+          instantiate: () => ({
+            run: () => {
+              dispose();
+            },
+          }),
+
+          injectionToken: onApplicationQuitInjectionToken,
+        });
+
+        // TODO: Register once?
+        di.register(disposeInjectable);
       },
     };
   },

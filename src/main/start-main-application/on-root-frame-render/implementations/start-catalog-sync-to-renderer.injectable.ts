@@ -6,6 +6,7 @@ import { getInjectable } from "@ogre-tools/injectable";
 import { onRootFrameRenderInjectionToken } from "../on-root-frame-render-injection-token";
 import { startCatalogSyncToRenderer } from "../../../catalog-pusher";
 import catalogEntityRegistryInjectable from "../../../catalog/catalog-entity-registry.injectable";
+import { onApplicationCloseInjectionToken } from "../../on-application-close/on-application-close-injection-token";
 
 const startCatalogSyncToRendererInjectable = getInjectable({
   id: "start-catalog-sync-to-renderer",
@@ -15,9 +16,24 @@ const startCatalogSyncToRendererInjectable = getInjectable({
 
     return {
       run: () => {
+        const dispose = startCatalogSyncToRenderer(catalogEntityRegistry);
 
-        // TODO: Dispose on application "close"
-        startCatalogSyncToRenderer(catalogEntityRegistry);
+
+        const disposeInjectable = getInjectable({
+          id: "dispose-catalog-sync",
+
+          instantiate: () => ({
+            run: () => {
+              dispose();
+            },
+          }),
+
+          injectionToken: onApplicationCloseInjectionToken,
+        });
+
+        // TODO: Register once?
+        di.register(disposeInjectable);
+
       },
     };
   },

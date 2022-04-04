@@ -7,6 +7,7 @@ import { onApplicationIsReadyInjectionToken } from "../on-application-is-ready-i
 import { buildMenu } from "../../../menu/menu";
 import applicationMenuItemsInjectable from "../../../menu/application-menu-items.injectable";
 import { autorun } from "mobx";
+import { onApplicationQuitInjectionToken } from "../../on-application-close/implementations/quit-application/on-application-quit/on-application-quit-injection-token";
 
 const setupApplicationMenuInjectable = getInjectable({
   id: "setup-application-menu",
@@ -16,11 +17,24 @@ const setupApplicationMenuInjectable = getInjectable({
 
     return {
       run: () => {
-
-        // TODO: Dispose on application quit
-        autorun(() => buildMenu(applicationMenuItems.get()), {
+        const dispose = autorun(() => buildMenu(applicationMenuItems.get()), {
           delay: 100,
         });
+
+        const disposeInjectable = getInjectable({
+          id: "dispose-application-menu-items",
+
+          instantiate: () => ({
+            run: () => {
+              dispose();
+            },
+          }),
+
+          injectionToken: onApplicationQuitInjectionToken,
+        });
+
+        // TODO: Register once?
+        di.register(disposeInjectable);
       },
     };
   },

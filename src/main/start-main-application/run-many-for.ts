@@ -16,7 +16,7 @@ export const runManyFor =
   <TRunnable extends Runnable<unknown>>(
       injectionToken: InjectionToken<TRunnable, void>,
     ) =>
-      async (...parameter: Parameters<TRunnable["run"]>) =>
+      async (parameter: Parameters<TRunnable["run"]>[0]) =>
         await Promise.all(
           di.injectMany(injectionToken).map((runnable) => runnable.run(parameter)),
         );

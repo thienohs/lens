@@ -3,14 +3,11 @@
  * Licensed under MIT License. See LICENSE in root directory for more information.
  */
 import { getInjectionToken } from "@ogre-tools/injectable";
-import type { Runnable } from "../run-many-for";
+import type { Runnable } from "../../../../run-many-for";
 import type { Event } from "electron";
 
-export const onOpenOfUrlInjectionToken = getInjectionToken<
-  Runnable<{
-    event: Event;
-    url: string;
-  }>
+export const onApplicationQuitInjectionToken = getInjectionToken<
+  Runnable<{ event: Event }>
 >({
-  id: "on-open-of-url",
+  id: "on-application-quit",
 });

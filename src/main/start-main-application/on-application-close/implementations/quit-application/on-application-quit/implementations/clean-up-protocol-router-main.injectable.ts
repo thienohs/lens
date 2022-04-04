@@ -3,18 +3,18 @@
  * Licensed under MIT License. See LICENSE in root directory for more information.
  */
 import { getInjectable } from "@ogre-tools/injectable";
-import kubeconfigSyncManagerInjectable from "../../../catalog-sources/kubeconfig-sync-manager/kubeconfig-sync-manager.injectable";
 import { onApplicationQuitInjectionToken } from "../on-application-quit-injection-token";
+import lensProtocolRouterMainInjectable from "../../../../../../protocol-handler/lens-protocol-router-main/lens-protocol-router-main.injectable";
 
-const stopKubeConfigSyncInjectable = getInjectable({
-  id: "stop-kube-config-sync",
+const cleanUpProtocolRouterMainInjectable = getInjectable({
+  id: "clean-up-protocol-router-main",
 
   instantiate: (di) => {
-    const kubeConfigSyncManager = di.inject(kubeconfigSyncManagerInjectable);
+    const lensProtocolRouterMain = di.inject(lensProtocolRouterMainInjectable);
 
     return {
       run: () => {
-        kubeConfigSyncManager.stopSync();
+        lensProtocolRouterMain.cleanup();
       },
     };
   },
@@ -22,4 +22,4 @@ const stopKubeConfigSyncInjectable = getInjectable({
   injectionToken: onApplicationQuitInjectionToken,
 });
 
-export default stopKubeConfigSyncInjectable;
+export default cleanUpProtocolRouterMainInjectable;
