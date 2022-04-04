@@ -6,9 +6,7 @@ import { getInjectable } from "@ogre-tools/injectable";
 import { AppPaths, appPathsIpcChannel } from "../../common/app-paths/app-path-injection-token";
 import getValueFromRegisteredChannelInjectable from "./get-value-from-registered-channel/get-value-from-registered-channel.injectable";
 import appPathsStateInjectable from "../../common/app-paths/app-paths-state.injectable";
-import {
-  onApplicationIsReadyInjectionToken,
-} from "../../main/start-main-application/start-main-application.injectable";
+import { onApplicationIsReadyInjectionToken } from "../../main/start-main-application/on-application-is-ready/on-application-is-ready-injection-token";
 
 let syncAppPaths: AppPaths;
 

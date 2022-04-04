@@ -3,14 +3,18 @@
  * Licensed under MIT License. See LICENSE in root directory for more information.
  */
 import {
-  DiContainerForInjection,
   getInjectable,
-  getInjectionToken,
-  InjectionToken,
 } from "@ogre-tools/injectable";
 
 import electronAppInjectable from "../app-paths/get-electron-app-path/electron-app/electron-app.injectable";
 import appEventBusInjectable from "../../common/app-event-bus/app-event-bus.injectable";
+import { beforeApplicationIsReadyInjectionToken } from "./before-application-is-ready/before-application-is-ready-injection-token";
+import { onApplicationIsReadyInjectionToken } from "./on-application-is-ready/on-application-is-ready-injection-token";
+import { onSecondApplicationInstanceInjectionToken } from "./on-second-application-instance/on-second-application-instance-injection-token";
+import { onApplicationActivationInjectionToken } from "./on-application-activation/on-application-activation-injection-token";
+import { onApplicationQuitInjectionToken } from "./on-application-quit/on-application-quit-injection-token";
+import { onOpenOfUrlInjectionToken } from "./on-open-of-url/on-open-of-url-injection-token";
+import { runManyFor } from "./run-many-for";
 
 const startMainApplicationInjectable = getInjectable({
   id: "start-main-application",
@@ -73,52 +77,5 @@ const startMainApplicationInjectable = getInjectable({
 
 export default startMainApplicationInjectable;
 
-export const beforeApplicationIsReadyInjectionToken =
-  getInjectionToken<Runnable>({
-    id: "before-application-is-ready",
-  });
 
-export const onApplicationIsReadyInjectionToken = getInjectionToken<Runnable>({
-  id: "on-application-is-ready",
-});
 
-export const onSecondApplicationInstanceInjectionToken = getInjectionToken<
-  Runnable<{ commandLineArguments: string[] }>
->({
-  id: "on-second-application-instance",
-});
-
-export const onApplicationActivationInjectionToken = getInjectionToken<
-  Runnable<{ hasVisibleWindows: boolean }>
->({
-  id: "on-application-activation",
-});
-
-export const onApplicationQuitInjectionToken = getInjectionToken<
-  Runnable<{ event: Electron.Event }>
->({
-  id: "on-application-quit",
-});
-
-export const onOpenOfUrlInjectionToken = getInjectionToken<
-  Runnable<{
-    event: Electron.Event;
-    url: string;
-  }>
->({
-  id: "on-open-of-url",
-});
-
-export interface Runnable<TParameter = void> {
-  run: (parameter: TParameter) => Promise<void> | void;
-}
-
-export const runManyFor =
-  (di: DiContainerForInjection) =>
-  <TRunnable extends Runnable<unknown>>(
-      injectionToken: InjectionToken<TRunnable, void>,
-    ) =>
-      async (...parameter: Parameters<TRunnable["run"]>) =>
-        await Promise.all(
-          di.injectMany(injectionToken).map((runnable) => runnable.run(parameter)),
-        );

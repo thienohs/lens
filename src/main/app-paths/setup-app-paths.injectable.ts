@@ -14,8 +14,10 @@ import { fromPairs, map } from "lodash/fp";
 import { pipeline } from "@ogre-tools/fp";
 import { appPathsIpcChannel } from "../../common/app-paths/app-path-injection-token";
 import registerChannelInjectable from "./register-channel/register-channel.injectable";
-import { beforeApplicationIsReadyInjectionToken } from "../start-main-application/start-main-application.injectable";
 import joinPathsInjectable from "../../common/path/join-paths.injectable";
+import {
+  beforeApplicationIsReadyInjectionToken,
+} from "../start-main-application/before-application-is-ready/before-application-is-ready-injection-token";
 
 const setupAppPathsInjectable = getInjectable({
   id: "setup-app-paths",

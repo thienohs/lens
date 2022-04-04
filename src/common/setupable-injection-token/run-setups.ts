@@ -3,10 +3,8 @@
  * Licensed under MIT License. See LICENSE in root directory for more information.
  */
 import type { DiContainer } from "@ogre-tools/injectable";
-
-import {
-  onApplicationIsReadyInjectionToken, beforeApplicationIsReadyInjectionToken,
-} from "../../main/start-main-application/start-main-application.injectable";
+import { beforeApplicationIsReadyInjectionToken } from "../../main/start-main-application/before-application-is-ready/before-application-is-ready-injection-token";
+import { onApplicationIsReadyInjectionToken } from "../../main/start-main-application/on-application-is-ready/on-application-is-ready-injection-token";
 
 export const runSetups = async (di: DiContainer) => {
   await Promise.all(

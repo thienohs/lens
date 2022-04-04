@@ -5,6 +5,11 @@
 import { getInjectionToken } from "@ogre-tools/injectable";
 import type { Runnable } from "../run-many-for";
 
-export const onRootFrameRenderInjectionToken = getInjectionToken<Runnable>({
-  id: "on-root-frame-render",
+export const onOpenOfUrlInjectionToken = getInjectionToken<
+  Runnable<{
+    event: Electron.Event;
+    url: string;
+  }>
+>({
+  id: "on-open-of-url",
 });
