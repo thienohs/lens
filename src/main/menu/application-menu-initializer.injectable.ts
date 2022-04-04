@@ -11,12 +11,12 @@ const applicationMenuInitializerInjectable = getInjectable({
   id: "application-menu-initializer",
 
   instantiate: (di) => {
-    const applicationMenuItems = di.inject(applicationMenuItemsInjectable);
-
     let disposer: () => void;
 
     return {
       start: () => {
+        const applicationMenuItems = di.inject(applicationMenuItemsInjectable);
+
         disposer = autorun(() => buildMenu(applicationMenuItems.get()), {
           delay: 100,
         });
