@@ -7,7 +7,6 @@ import {
 } from "@ogre-tools/injectable";
 
 import electronAppInjectable from "../app-paths/get-electron-app-path/electron-app/electron-app.injectable";
-import appEventBusInjectable from "../../common/app-event-bus/app-event-bus.injectable";
 import { beforeApplicationIsReadyInjectionToken } from "./before-application-is-ready/before-application-is-ready-injection-token";
 import { onApplicationIsReadyInjectionToken } from "./on-application-is-ready/on-application-is-ready-injection-token";
 import { onSecondApplicationInstanceInjectionToken } from "./on-second-application-instance/on-second-application-instance-injection-token";
@@ -22,7 +21,6 @@ const startMainApplicationInjectable = getInjectable({
   instantiate: (di) => {
     const runMany = runManyFor(di);
     const app = di.inject(electronAppInjectable);
-    const appEventBus = di.inject(appEventBusInjectable);
 
     const runManyBeforeApplicationIsReady = runMany(
       beforeApplicationIsReadyInjectionToken,
@@ -66,11 +64,6 @@ const startMainApplicationInjectable = getInjectable({
       await app.whenReady();
 
       await runManyAfterApplicationIsReady();
-
-      // TODO: Figure out place for this
-      setTimeout(() => {
-        appEventBus.emit({ name: "service", action: "start" });
-      }, 1000);
     };
   },
 });
