@@ -29,7 +29,12 @@ export const isDebugging = ["true", "1", "yes", "y", "on"].includes((process.env
 export const isSnap = !!process.env.SNAP;
 export const isProduction = process.env.NODE_ENV === "production";
 export const isTestEnv = !!process.env.JEST_WORKER_ID;
+
+/**
+ * @deprecated Switch to using isDevelopmentInjectable
+ */
 export const isDevelopment = !isTestEnv && !isProduction;
+
 export const isPublishConfigured = Object.keys(packageInfo.build).includes("publish");
 
 export const integrationTestingArg = "--integration-testing";
