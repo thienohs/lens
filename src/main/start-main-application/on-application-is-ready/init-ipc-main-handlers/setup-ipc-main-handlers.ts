@@ -31,7 +31,7 @@ interface Dependencies {
   clusterManager: ClusterManager;
 }
 
-export const setupIpcMainHandlers = ({ applicationMenuItems, directoryForLensLocalStorage, getAbsolutePath, clusterManager }: Dependencies) => () => {
+export const setupIpcMainHandlers = ({ applicationMenuItems, directoryForLensLocalStorage, getAbsolutePath, clusterManager }: Dependencies) => {
   ipcMainHandle(clusterActivateHandler, (event, clusterId: ClusterId, force = false) => {
     return ClusterStore.getInstance()
       .getById(clusterId)
